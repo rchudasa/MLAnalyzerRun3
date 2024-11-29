@@ -51,7 +51,7 @@ process.source = cms.Source("PoolSource",
     )
 print(" >> Loaded",len(options.inputFiles),"input files from list.")
 
-process.load("MLAnalyzer_run3.RecHitAnalyzer.RHAnalyzer_cfi")
+process.load("MLAnalyzerRun3.RecHitAnalyzer.RHAnalyzer_cfi")
 process.fevt.isMC =cms.bool(False)
 process.fevt.mode = cms.string(options.processMode)
 #process.fevt.mode = cms.string("JetLevel") # for when using crab
@@ -66,11 +66,11 @@ process.TFileService = cms.Service("TFileService",
 ############################
 # Event Analysis
 ############################
-process.load('MLAnalyzer_run3.RecHitAnalyzer.hltanalysis_cfi')
-process.load('MLAnalyzer_run3.RecHitAnalyzer.hltobject_cfi')
-#process.load('MLAnalyzer_run3.RecHitAnalyzer.l1object_cfi')
+process.load('MLAnalyzerRun3.RecHitAnalyzer.hltanalysis_cfi')
+process.load('MLAnalyzerRun3.RecHitAnalyzer.hltobject_cfi')
+#process.load('MLAnalyzerRun3.RecHitAnalyzer.l1object_cfi')
 
-from MLAnalyzer_run3.RecHitAnalyzer.hltobject_cfi import trigger_list_data
+from MLAnalyzerRun3.RecHitAnalyzer.hltobject_cfi import trigger_list_data
 process.hltobject.triggerNames = trigger_list_data
 
 process.hltFilter = cms.EDFilter("HLTHighLevel",

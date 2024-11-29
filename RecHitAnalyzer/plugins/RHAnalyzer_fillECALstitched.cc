@@ -1,4 +1,4 @@
-#include "MLAnalyzer_run3/RecHitAnalyzer/interface/RecHitAnalyzer.h"
+#include "MLAnalyzerRun3/RecHitAnalyzer/interface/RecHitAnalyzer.h"
 
 // Fill stitched EEm_EB_EEp image /////////////////////............/
 // Store all ECAL event rechits into a stitched EEm_EB_EEp image

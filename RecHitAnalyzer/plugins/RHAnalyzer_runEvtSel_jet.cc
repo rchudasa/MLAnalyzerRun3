@@ -1,5 +1,5 @@
 
-#include "MLAnalyzer_run3/RecHitAnalyzer/interface/RecHitAnalyzer.h"
+#include "MLAnalyzerRun3/RecHitAnalyzer/interface/RecHitAnalyzer.h"
 
 using std::vector;
 
@@ -93,10 +93,10 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
    bool accept = hltresults->accept(itrig);
    if (!(accept)) continue;
    std::cout << " Accept >>>>>>>>>>>>>>>>>>>>" << trigName << std::endl;
-    }*/
-
+    }
+  */
   int hltAccept = -1;
-  std::string trgName = "HLT_Double*ChargedIsoPFTau*_Trk1_*";
+  std::string trgName = "HLT_PFHT280_QuadPFJet30_v1";
   std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgName );
   std::cout << " N matches: " << trgMatches.size() << std::endl;
 

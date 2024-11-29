@@ -5,8 +5,8 @@ import FWCore.ParameterSet.Config as cms
 from RecoMET.METProducers.METSignificanceParams_cfi import METSignificanceParams
 
 fevt = cms.EDAnalyzer('RecHitAnalyzer'
-    , task                           = cms.string("dijet_tau_massregression")
-    # , task                           = cms.string("dijet_ditau")
+    #, task                           = cms.string("dijet_tau_massregression")
+     , task                           = cms.string("dijet_ditau")
     #, task                           = cms.string("tau_classification")
     #, task                           = cms.string("jet_ele_classification")
     #, task                           = cms.string("qcd")

@@ -57,7 +57,7 @@ process.options = cms.untracked.PSet(
     # ,SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
 
-process.load("MLAnalyzer_run3.RecHitAnalyzer.RHAnalyzer_cfi")
+process.load("MLAnalyzerRun3.RecHitAnalyzer.RHAnalyzer_cfi")
 process.fevt.mode = cms.string(options.processMode)
 print (" >> Processing as:",(process.fevt.mode))
 

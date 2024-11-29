@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from MLAnalyzer_run3.RecHitAnalyzer.dummybranches_cff import *
+from MLAnalyzerRun3.RecHitAnalyzer.dummybranches_cff import *
 
 hltanalysis = cms.EDAnalyzer('HLTBitAnalyzer',
     HLTProcessName = cms.string('HLT'),
