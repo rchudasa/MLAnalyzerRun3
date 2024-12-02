@@ -47,7 +47,7 @@ void RecHitAnalyzer::branchesEvtSel_jet_dijet_ditau_h2aa4Tau ( TTree* tree, edm:
 // Run event selection ___________________________________________________________________//
 bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau_h2aa4Tau ( const edm::Event& iEvent, const edm::EventSetup& iSetup ) {
 
-  std::cout << "Coming in Gen loop" << std::endl;
+  if(debug)std::cout << "Coming in Gen loop" << std::endl;
 
   edm::Handle<reco::GenParticleCollection> genParticles;
   iEvent.getByToken(genParticleCollectionT_, genParticles);
@@ -62,19 +62,19 @@ for ( unsigned int iG = 0; iG < genParticles->size(); iG++ ) {
     if ( iGen->numberOfDaughters() != 2 ) continue;
     if ( abs(iGen->daughter(0)->pdgId()) != 15 || abs(iGen->daughter(1)->pdgId()) != 15 ) continue;
 
-    std::cout<<"*****************************************************"<< std::endl;
-    std::cout<< "iG:" << iG << " ID:" << iGen->pdgId() << " A mass:" << iGen->mass() << std::endl;
+    if(debug)std::cout<<"*****************************************************"<< std::endl;
+    if(debug)std::cout<< "iG:" << iG << " ID:" << iGen->pdgId() << " A mass:" << iGen->mass() << std::endl;
     gen_obj Gen_obj = { iG, std::abs(iGen->pt()) };
     vATaus.push_back( Gen_obj );
     vH += iGen->p4();
 
   }
 
-  std::cout<< "********** Gen Higgs mass " << vH.mass() << std::endl;
+  if(debug)std::cout<< "********** Gen Higgs mass " << vH.mass() << std::endl;
 
   if ( vATaus.size() != 2 ) return false;
   mHgen_ = vH.mass();
-  std::cout << "*************************************** Higgs mass:" << mHgen_ << "**************************" << std::endl;
+  if(debug)std::cout << "*************************************** Higgs mass:" << mHgen_ << "**************************" << std::endl;
   // Sort As by pT, for abitrary N
   std::sort( vATaus.begin(), vATaus.end(), [](auto const &a, auto const &b) { return a.pt > b.pt; } );
 

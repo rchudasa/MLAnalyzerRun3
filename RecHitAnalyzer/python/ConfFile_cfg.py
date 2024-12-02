@@ -61,6 +61,14 @@ process.load("MLAnalyzerRun3.RecHitAnalyzer.RHAnalyzer_cfi")
 process.fevt.mode = cms.string(options.processMode)
 print (" >> Processing as:",(process.fevt.mode))
 
+############################
+#process.load('MLAnalyzerRun3.RecHitAnalyzer.hltanalysis_cfi')
+#process.load('MLAnalyzerRun3.RecHitAnalyzer.hltobject_cfi')
+#process.load('MLAnalyzer.RecHitAnalyzer.l1object_cfi')
+
+#from MLAnalyzerRun3.RecHitAnalyzer.hltobject_cfi import trigger_list_data
+#process.hltobject.triggerNames = trigger_list_data
+
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string(options.outputFile)
     )
@@ -73,14 +81,16 @@ process.hltFilter = cms.EDFilter("HLTHighLevel",
                                           eventSetupPathsKey = cms.string(''),
                                           TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
                                           #HLTPaths = cms.vstring('HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*'),
-                                          HLTPaths = cms.vstring('*'),
+                                          #HLTPaths = cms.vstring('HLT_PFHT280_QuadPFJet30*'),
+                                          HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*'),
                                           andOr = cms.bool(True),
                                           throw = cms.bool(False)
                                           )
 
 process.p = cms.Path(
 process.siStripMatchedRecHits*process.siPixelRecHits*process.MeasurementTrackerEvent*process.TrackRefitter*
- process.hltFilter*
+ #process.hltFilter*
+ #process.hltanalysis*
  # process.patDefaultSequence*
 process.fevt
 )

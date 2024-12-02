@@ -210,8 +210,8 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 
       if( jet_taudR > 0.4) continue;
 
-      std ::cout<< "Jet matched with tau jetID " << iJ << " tau ID:" << iT1 << " tau-Jet dR: " << jet_taudR << " jet pt: " << iJet->pt() << ", Eta: " << iJet->eta() << ", Phi: " << iJet->phi();
-      std:: cout<< " tau pT: " << iTau1->pt() << " eta:" << iTau1->eta() << " phi "<< iTau1->phi() << std::endl;
+      if(debug) std ::cout<< "Jet matched with tau jetID " << iJ << " tau ID:" << iT1 << " tau-Jet dR: " << jet_taudR << " jet pt: " << iJet->pt() << ", Eta: " << iJet->eta() << ", Phi: " << iJet->phi();
+      if(debug) std:: cout<< " tau pT: " << iTau1->pt() << " eta:" << iTau1->eta() << " phi "<< iTau1->phi() << std::endl;
 
       vMatchedRecoJetIdxs.push_back(iJ);
       vMatchedRecoTauIdxs.push_back(iT1);
@@ -278,8 +278,8 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 
       if(recotaudR > 0.5){
 
-	std::cout << "================         In Combination loop        ====================" << std::endl;
-	std::cout<< " j: "<< j << " Tau1 pt:" << iTau1->pt() << "  eta:" << iTau1->eta() << "  k:" << k << "  tau2 pt: " << iTau2->pt() << "  eta:" << iTau2->eta() << std::endl;
+	if(debug) std::cout << "================         In Combination loop        ====================" << std::endl;
+	if(debug) std::cout<< " j: "<< j << " Tau1 pt:" << iTau1->pt() << "  eta:" << iTau1->eta() << "  k:" << k << "  tau2 pt: " << iTau2->pt() << "  eta:" << iTau2->eta() << std::endl;
 
 	TLorentzVector Tau1  = SetTau(iTau1->pt(), iTau1->eta(), iTau1->phi(), iTau1->mass());
 	TLorentzVector Tau2  = SetTau(iTau2->pt(), iTau2->eta(), iTau2->phi(), iTau2->mass());
@@ -343,7 +343,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 	float svFitPt = ttP4.Pt();
 	//float svFitEta = ttP4.Eta();
 	//float svFitPhi = ttP4.Phi();
-	std::cout << " Found mass = " << svFitMass << std::endl;
+	if(debug) std::cout << " Found mass = " << svFitMass << std::endl;
 
 	//if (!( svFitMass > 50 && svFitMass < 130 && ditau_mth < 50 )) return false;
 	//if ( svFitMass > 50 && svFitMass < 130 && ditau_mth < 50 ){
@@ -545,11 +545,11 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
 
       float recotaudR = reco::deltaR( iTau1->eta(),iTau1->phi(), iTau2->eta(),iTau2->phi() );
 
-      std ::cout<< " jet pt: " << iJet1->pt() << ", Eta: " << iJet1->eta() << ", Phi: " << iJet1->phi();
-      std:: cout<< " tau pT: " << iTau1->pt() << " eta:" << iTau1->eta() << " phi "<< iTau1->phi() << std::endl;
+      if(debug)std ::cout<< " jet pt: " << iJet1->pt() << ", Eta: " << iJet1->eta() << ", Phi: " << iJet1->phi();
+      if(debug)std:: cout<< " tau pT: " << iTau1->pt() << " eta:" << iTau1->eta() << " phi "<< iTau1->phi() << std::endl;
 
-      std ::cout<< " jet 2 pt: " << iJet2->pt() << ", Eta: " << iJet2->eta() << ", Phi: " << iJet2->phi();
-      std:: cout<< " tau 2 pT: " << iTau2->pt() << " eta:" << iTau2->eta() << " phi "<< iTau2->phi() << std::endl;
+      if(debug)std ::cout<< " jet 2 pt: " << iJet2->pt() << ", Eta: " << iJet2->eta() << ", Phi: " << iJet2->phi();
+      if(debug)std:: cout<< " tau 2 pT: " << iTau2->pt() << " eta:" << iTau2->eta() << " phi "<< iTau2->phi() << std::endl;
 
       float taudR = reco::deltaR( iTau1->eta(),iTau1->phi(), iTau2->eta(),iTau2->phi() );
       TLorentzVector Tau1  = SetTau(iTau1->pt(), iTau1->eta(), iTau1->phi(), iTau1->mass());

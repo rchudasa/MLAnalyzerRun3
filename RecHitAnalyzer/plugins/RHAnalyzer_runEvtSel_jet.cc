@@ -96,7 +96,8 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
     }
   */
   int hltAccept = -1;
-  std::string trgName = "HLT_PFHT280_QuadPFJet30_v1";
+  //std::string trgName = "HLT_PFHT280_QuadPFJet30_v1";
+  std::string trgName = "HLT_DoubleMediumDeepTauPFTauHPS*";
   std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgName );
   std::cout << " N matches: " << trgMatches.size() << std::endl;
 
@@ -117,7 +118,10 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   std::cout << "*************** hltAccept:" << hltAccept << std::endl;
   hltAccept_ = hltAccept;
   // Ensure trigger acceptance
-  hNpassed_hlt->Fill(hltAccept);
+  if(hltAccept==1) {
+	  hNpassed_hlt->Fill(1);
+	 }
+  else hNpassed_hlt->Fill(0);
  // if ( hltAccept_ != 1 ) return false;
 
   // Each jet selection must fill vJetIdxs with good jet indices
