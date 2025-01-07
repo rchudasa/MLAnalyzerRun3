@@ -47,6 +47,7 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
     , srcPfJets                      = cms.InputTag("ak4PFJets")
     , metCollection                  = cms.InputTag("pfMet")
     , eleCollection                  = cms.InputTag("gedGsfElectrons")
+    , muonCollection                 = cms.InputTag("muons")
     , tauCollection                  = cms.InputTag("hpsPFTauProducer")
 
     # , tauMVAIsolationLoose           = cms.InputTag("hpsPFTauDiscriminationByLooseIsolationMVArun2v1DBoldDMwLT")
@@ -54,9 +55,10 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
     # , tauMVAIsolationTight           = cms.InputTag("hpsPFTauDiscriminationByTightIsolationMVArun2v1DBoldDMwLT")
     , tauMVAIsolationRaw             = cms.InputTag("hpsPFTauDiscriminationByIsolationMVArun2v1DBoldDMwLTraw")
     # # , tauMVAIsolationRaw             = cms.InputTag("hpsPFTauDiscriminationByIsolationMVArun2v1DBnewDMwLTraw")
-    # , tauMuonRejectionLoose          = cms.InputTag("hpsPFTauDiscriminationByLooseMuonRejection3")
-    # , tauElectronRejectionMVA6Loose  = cms.InputTag("hpsPFTauDiscriminationByMVA6LooseElectronRejection")
-    # , tauElectronRejectionMVA6VLoose = cms.InputTag("hpsPFTauDiscriminationByMVA6VLooseElectronRejection")
+    , tauMuonRejectionLoose          = cms.InputTag("hpsPFTauDiscriminationByMuonRejection3")
+    #, tauMuonRejectionLoose          = cms.InputTag("hpsPFTauDiscriminationByLooseMuonRejection3")
+    , tauElectronRejectionMVA6Loose  = cms.InputTag("hpsPFTauDiscriminationByMVA6LooseElectronRejection")
+    , tauElectronRejectionMVA6VLoose = cms.InputTag("hpsPFTauDiscriminationByMVA6VLooseElectronRejection")
     , tauDecayMode                   = cms.InputTag("hpsPFTauDiscriminationByDecayModeFinding")
     # # , tauDecayMode                   = cms.InputTag("hpsPFTauDiscriminationByDecayModeFindingOldDMs")
 

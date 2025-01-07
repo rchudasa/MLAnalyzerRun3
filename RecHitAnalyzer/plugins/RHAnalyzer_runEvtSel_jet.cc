@@ -17,6 +17,10 @@ vector<float> vJetSeed_iphi_;
 vector<float> vJetSeed_ieta_;
 vector<int>   vFailedJetIdx_;
 int hltAccept_;
+int HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_;
+int HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet60_;
+int HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet75_;
+int HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_OneProng_M5to80_;
 
 TH1F * hNpassed_hlt;
 
@@ -36,6 +40,10 @@ void RecHitAnalyzer::branchesEvtSel_jet ( TTree* tree, edm::Service<TFileService
   tree->Branch("hltAccept",      &hltAccept_);
   tree->Branch("eventId",        &jet_eventId_);
   tree->Branch("runId",          &jet_runId_);
+  tree->Branch("HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1",          &HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_);
+  tree->Branch("HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet60",  &HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet60_);
+  tree->Branch("HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet75",  &HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet75_);
+  tree->Branch("HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_OneProng_M5to80", &HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_OneProng_M5to80_);
   tree->Branch("lumiId",         &jet_lumiId_);
   tree->Branch("jetSeed_iphi",   &vJetSeed_iphi_);
   tree->Branch("jetSeed_ieta",   &vJetSeed_ieta_);
@@ -48,7 +56,7 @@ void RecHitAnalyzer::branchesEvtSel_jet ( TTree* tree, edm::Service<TFileService
     branchesEvtSel_jet_dijet_tau( tree, fs );
   } else if ( task_ == "dijet_ditau" ) {
     branchesEvtSel_jet_dijet_ditau( tree, fs );
-    branchesEvtSel_jet_dijet_ditau_h2aa4Tau( tree, fs );
+    if(isMC_)branchesEvtSel_jet_dijet_ditau_h2aa4Tau( tree, fs );
   } else if ( task_ == "dijet_tau_massregression" ) {
     branchesEvtSel_jet_dijet_tau_massregression( tree, fs );
   } else if ( task_ == "dijet_ele_massregression" ) {
@@ -83,7 +91,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   int ntrigs = hltresults->size();
   edm::TriggerNames const& triggerNames = iEvent.triggerNames(*hltresults);
 
-  std::cout << " N triggers:" << ntrigs << std::endl;
+  if(debug)std::cout << " N triggers:" << ntrigs << std::endl;
 
   //int passTrigger = 0;
   /*for (int itrig = 0; itrig != ntrigs; ++itrig)
@@ -97,32 +105,34 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   */
   int hltAccept = -1;
   //std::string trgName = "HLT_PFHT280_QuadPFJet30_v1";
-  std::string trgName = "HLT_DoubleMediumDeepTauPFTauHPS*";
+  //std::string trgName = "HLT_DoubleMediumDeepTauPFTauHPS*";
+  std::string trgName = "HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1*";
   std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgName );
-  std::cout << " N matches: " << trgMatches.size() << std::endl;
+  if(debug)std::cout << " N matches: " << trgMatches.size() << std::endl;
 
   if ( !trgMatches.empty() ) {
     //std::vector<std::string>  HLTPathsByName_;
     //    //std::vector<unsigned int> HLTPathsByIndex_;
     hltAccept = 0;
     for ( auto const& iT : trgMatches ) {
+	 if(debug)   std::cout << triggerNames.triggerIndex(*iT)<<"]:"<< *iT << std::endl;
       //HLTPathsByName_.push_back( *iT );
       //HLTPathsByIndex_.push_back( triggerNames.triggerIndex(*iT) );
       if ( hltresults->accept(triggerNames.triggerIndex(*iT)) ){
 	    hltAccept = 1;
-            std::cout << " name["<<triggerNames.triggerIndex(*iT)<<"]:"<< *iT << " -> " << hltresults->accept(triggerNames.triggerIndex(*iT)) << std::endl;
+            if(debug)std::cout << " name["<<triggerNames.triggerIndex(*iT)<<"]:"<< *iT << " -> " << hltresults->accept(triggerNames.triggerIndex(*iT)) << std::endl;
       	  break;
 	}
     }
   }
-  std::cout << "*************** hltAccept:" << hltAccept << std::endl;
+  if(debug)std::cout << "*************** hltAccept:" << hltAccept << std::endl;
   hltAccept_ = hltAccept;
   // Ensure trigger acceptance
   if(hltAccept==1) {
 	  hNpassed_hlt->Fill(1);
 	 }
   else hNpassed_hlt->Fill(0);
- // if ( hltAccept_ != 1 ) return false;
+  if ( hltAccept_ != 1 ) return false;
 
   // Each jet selection must fill vJetIdxs with good jet indices
 
@@ -156,12 +166,12 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   }
 
   if ( !hasPassed ) return false;
-  if (task_ == "dijet_ditau") runEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
+  if (task_ == "dijet_ditau" && isMC_) runEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
 
   std::sort(vJetIdxs.begin(), vJetIdxs.end());
   if ( debug ) {
     for ( int thisJetIdx : vJetIdxs ) {
-      std::cout << " index order:" << thisJetIdx << std::endl;
+      if(debug)std::cout << " index order:" << thisJetIdx << std::endl;
     }
   }
 
@@ -201,7 +211,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
     HcalDetId hId( spr::findDetIdHCAL(&caloGeom, iJet->eta(), iJet->phi(), false ) );
     if ( hId.subdet() != HcalBarrel && hId.subdet() != HcalEndcap ){
       vFailedJetIdx_.push_back(thisJetIdx);
-      std::cout << "Fail getting HBHE tower to jet position" << std::endl;
+      if(debug)std::cout << "Fail getting HBHE tower to jet position" << std::endl;
       continue;
     }
     HBHERecHitCollection::const_iterator iRHit( HBHERecHitsH_->find(hId) );
@@ -297,7 +307,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
     fillEvtSel_jet_dijet_tau( iEvent, iSetup );
   } else if ( task_ == "dijet_ditau" ) {
     fillEvtSel_jet_dijet_ditau( iEvent, iSetup );
-    fillEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
+    if(isMC_)fillEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
   } else if ( task_ == "dijet_tau_massregression" ) {
     fillEvtSel_jet_dijet_tau_massregression( iEvent, iSetup );
   } else if ( task_ == "dijet_ele_massregression" ) {

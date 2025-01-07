@@ -55,6 +55,7 @@ print (" >> Loaded",len(options.inputFiles),"input files from list.")
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
     # ,SkipEvent = cms.untracked.vstring('ProductNotFound')
+    ,numberOfThreads = cms.untracked.uint32(4)
 )
 
 process.load("MLAnalyzerRun3.RecHitAnalyzer.RHAnalyzer_cfi")
@@ -82,14 +83,15 @@ process.hltFilter = cms.EDFilter("HLTHighLevel",
                                           TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
                                           #HLTPaths = cms.vstring('HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*'),
                                           #HLTPaths = cms.vstring('HLT_PFHT280_QuadPFJet30*'),
-                                          HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*'),
+                                          #HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*'),
+                                          HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1*'),
                                           andOr = cms.bool(True),
                                           throw = cms.bool(False)
                                           )
 
 process.p = cms.Path(
 process.siStripMatchedRecHits*process.siPixelRecHits*process.MeasurementTrackerEvent*process.TrackRefitter*
- #process.hltFilter*
+#process.hltFilter*
  #process.hltanalysis*
  # process.patDefaultSequence*
 process.fevt

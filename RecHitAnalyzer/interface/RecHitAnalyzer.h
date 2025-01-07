@@ -146,8 +146,8 @@
 #include "TauAnalysis/ClassicSVfit/interface/FastMTT.h"
 
 #include "JetMETCorrections/Modules/interface/JetResolutionESProducer.h"
-
-
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/MuonReco/interface/Muon.h"
 
 #include "TH1.h"
 #include "TH1F.h"
@@ -200,7 +200,7 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     bool isW_;
     bool isBoostedTop_;
     bool doJets_;
-
+    int tau1tau2Dr;
 
     // ----------member data ---------------------------
     // Tokens
@@ -222,6 +222,7 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     edm::EDGetTokenT<std::vector<reco::CandIPTagInfo> >    ipTagInfoCollectionT_;
     edm::EDGetTokenT<reco::PFMETCollection> metCollectionT_;
     edm::EDGetTokenT<reco::GsfElectronCollection> eleCollectionT_;
+    edm::EDGetTokenT<reco::MuonCollection> muonCollectionT_;
 
     edm::EDGetTokenT<reco::PFTauCollection> tauCollectionT_;
     edm::EDGetTokenT<reco::PFTauDiscriminator> tauDiscriminatorT_;
@@ -424,7 +425,8 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 // constants, enums and typedefs
 //
-static const bool debug_ = false;
+static const bool debug_ = true;
+//static const bool debug_ = false;
 
 static const int nEE = 2;
 static const int nTOB = 6;

@@ -10,14 +10,15 @@ options.register('skipEvents',
     info = "skipEvents")
 # TODO: put this option in cmsRun scripts
 options.register('processMode',
-    default='EventLevel',
-    #default='JetLevel',
+    #default='EventLevel',
+    default='JetLevel',
     mult=VarParsing.VarParsing.multiplicity.singleton,
     mytype=VarParsing.VarParsing.varType.string,
     info = "process mode: JetLevel or EventLevel")
 options.parseArguments()
 
-process = cms.Process("FEVTAnalyzer")
+from Configuration.Eras.Era_Run3_cff import Run3
+process = cms.Process("FEVTAnalyzer", Run3)
 process.load("FWCore.MessageService.MessageLogger_cfi")
 process.load('Configuration.Geometry.GeometryRecoDB_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
@@ -32,7 +33,7 @@ process.load("RecoLocalTracker.SiStripRecHitConverter.SiStripRecHitConverter_cfi
 #process.load("Geometry.CMSCommonData.cmsIdealGeometryXML_cfi");
 #process.load("Geometry.CaloEventSetup.CaloGeometry_cfi");
 #process.load("Geometry.CaloEventSetup.CaloTopology_cfi");
-process.GlobalTag.globaltag = cms.string('130X_mcRun3_2023_realistic_postBPix_v5')
+process.GlobalTag.globaltag = cms.string('130X_dataRun3_PromptAnalysis_v1')
 process.es_prefer_GlobalTag = cms.ESPrefer('PoolDBESSource','GlobalTag')
 
 
@@ -63,16 +64,15 @@ process.TFileService = cms.Service("TFileService",
     fileName = cms.string(options.outputFile)
     )
 
+process.options = cms.untracked.PSet(
+    wantSummary = cms.untracked.bool(True)
+    # ,SkipEvent = cms.untracked.vstring('ProductNotFound')
+    ,numberOfThreads = cms.untracked.uint32(4)
+)
+
 ############################
 # Event Analysis
 ############################
-process.load('MLAnalyzerRun3.RecHitAnalyzer.hltanalysis_cfi')
-process.load('MLAnalyzerRun3.RecHitAnalyzer.hltobject_cfi')
-#process.load('MLAnalyzerRun3.RecHitAnalyzer.l1object_cfi')
-
-from MLAnalyzerRun3.RecHitAnalyzer.hltobject_cfi import trigger_list_data
-process.hltobject.triggerNames = trigger_list_data
-
 process.hltFilter = cms.EDFilter("HLTHighLevel",
                                           eventSetupPathsKey = cms.string(''),
                                           TriggerResultsTag = cms.InputTag("TriggerResults","","HLT"),
@@ -89,7 +89,7 @@ process.p = cms.Path(
   #process.hltFilter*
   #process.hltanalysis*
 #  process.patDefaultSequence*
-  process.hltanalysis*
+  #process.hltanalysis*
   process.fevt
 )
 

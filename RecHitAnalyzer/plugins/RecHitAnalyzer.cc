@@ -74,13 +74,14 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
 
   tauCollectionT_           = consumes<reco::PFTauCollection>(iConfig.getParameter<edm::InputTag>("tauCollection"));
   tauDecayMode_             = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauDecayMode"));
-  // tauMVAIsolation_          = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauMVAIsolationRaw"));
-  // tauMuonRejection_         = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauMuonRejectionLoose"));
-  // tauElectronRejectionMVA6_ = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauElectronRejectionMVA6VLoose"));
+  tauMVAIsolation_          = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauMVAIsolationRaw"));
+  tauMuonRejection_         = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauMuonRejectionLoose"));
+  tauElectronRejectionMVA6_ = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauElectronRejectionMVA6VLoose"));
 
   // boostedHPSPFTausTask_ = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("boostedHPSPFTausTask"));
 
   eleCollectionT_           = consumes<reco::GsfElectronCollection>(iConfig.getParameter<edm::InputTag>("eleCollection"));
+  muonCollectionT_          = consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muonCollection"));
 
   processName_              = iConfig.getUntrackedParameter<std::string>("processName","HLT");
   //triggerResultsToken_      = consumes<edm::TriggerResults> (iConfig.getUntrackedParameter<edm::InputTag>("triggerResultsTag", edm::InputTag("TriggerResults", "", "HLT")));
@@ -118,7 +119,6 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
 
 
 
-
   //johnda add configuration
   minJetPt_  = iConfig.getParameter<double>("minJetPt");
   maxJetEta_ = iConfig.getParameter<double>("maxJetEta");
@@ -136,7 +136,7 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
     doJets_ = false;
   }
 
-
+  //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  tau1tau2Dr: "<< tau1tau2Dr << std::endl;
 
   // Initialize file writer
   // NOTE: initializing dynamic-memory histograms outside of TFileService
@@ -222,7 +222,7 @@ RecHitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 
   nTotal++;
-  std::cout << "nTotal:"<< nTotal << std::endl;
+  if(debug)std::cout << "nTotal:"<< nTotal << std::endl;
   using namespace edm;
  // ----- Apply event selection cuts ----- //
 
@@ -284,13 +284,15 @@ RecHitAnalyzer::beginJob()
 {
   nTotal = 0;
   nPassed = 0;
+  tau1tau2Dr = 0;
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
 RecHitAnalyzer::endJob()
 {
-  std::cout << " selected: " << nPassed << "/" << nTotal << std::endl;
+  if(debug)std::cout << " selected: " << nPassed << "/" << nTotal << std::endl;
+  if(debug)std::cout << " selected tautaudr: " << tau1tau2Dr << "/" << nTotal << std::endl;
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------

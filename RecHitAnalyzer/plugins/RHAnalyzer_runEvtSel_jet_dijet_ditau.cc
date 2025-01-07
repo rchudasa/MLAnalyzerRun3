@@ -10,7 +10,9 @@ int  nKinTau_;
 
 TH1F * hNpassed_kin;
 TH1F * hNpassed_MVA;
-TH1F * hNpassed_mGG;
+TH1F * hNpassed_2Tau;
+TH1F * hNpassed_2TauDr;
+TH1F * hNpassed_mTT;
 TH1F * hNpassed_nRecoPho;
 TH1F * hNpassed_img;
 
@@ -108,7 +110,9 @@ void RecHitAnalyzer::branchesEvtSel_jet_dijet_ditau ( TTree* tree, edm::Service<
 
   hNpassed_kin      = fs->make<TH1F>("hNpassed_kin", "isPassed;isPassed;N", 2, 0., 2);
   hNpassed_MVA      = fs->make<TH1F>("hNpassed_MVA", "isPassed;isPassed;N", 2, 0., 2);
-  hNpassed_mGG      = fs->make<TH1F>("hNpassed_mGG", "isPassed;isPassed;N", 2, 0., 2);
+  hNpassed_2Tau     = fs->make<TH1F>("hNpassed_2Tau", "isPassed;isPassed;N", 2, 0., 2);
+  hNpassed_2TauDr   = fs->make<TH1F>("hNpassed_2TauDr", "isPassed;isPassed;N", 2, 0., 2);
+  hNpassed_mTT      = fs->make<TH1F>("hNpassed_mTT", "isPassed;isPassed;N", 2, 0., 2);
   hNpassed_nRecoPho = fs->make<TH1F>("hNpassed_nRecoPho", "isPassed;isPassed;N", 2, 0., 2);
 
 
@@ -129,14 +133,20 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
   edm::Handle<reco::PFMETCollection> pfmet;
   iEvent.getByToken(metCollectionT_, pfmet);
 
+  edm::Handle<reco::GsfElectronCollection> ele;    
+  iEvent.getByToken(eleCollectionT_, ele);        
+
+  edm::Handle<reco::MuonCollection> mus;    //TODO
+  iEvent.getByToken(muonCollectionT_, mus);         //TODO 
+
   edm::Handle<reco::PFTauDiscriminator> DecayMode;
   iEvent.getByToken(tauDecayMode_, DecayMode);
-  // edm::Handle<reco::PFTauDiscriminator> MVAIsolation;
-  // iEvent.getByToken(tauMVAIsolation_, MVAIsolation);
-  // edm::Handle<reco::PFTauDiscriminator> MuonRejection;
-  // iEvent.getByToken(tauMuonRejection_, MuonRejection);
-  // edm::Handle<reco::PFTauDiscriminator> ElectronRejectionMVA6;
-  // iEvent.getByToken(tauElectronRejectionMVA6_, ElectronRejectionMVA6);
+  edm::Handle<reco::PFTauDiscriminator> MVAIsolation;
+  iEvent.getByToken(tauMVAIsolation_, MVAIsolation);
+  edm::Handle<reco::PFTauDiscriminator> MuonRejection;
+  iEvent.getByToken(tauMuonRejection_, MuonRejection);
+  edm::Handle<reco::PFTauDiscriminator> ElectronRejectionMVA6;
+  iEvent.getByToken(tauElectronRejectionMVA6_, ElectronRejectionMVA6);
 
   // edm::Handle<reco::PFTauDiscriminator> boostedHPSPFTausTask;
   // iEvent.getByToken(boostedHPSPFTausTask_, boostedHPSPFTausTask);
@@ -234,11 +244,35 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 
   // Ensure two taus passing basic MVA identification cuts such as electron & muon rejection
   for ( unsigned int j = 0; j < vMatchedRecoJetIdxs.size(); j++ ) {
+        bool isMatched = false;
+
     //std::cout << " jet ID:" << vMatchedRecoJetIdxs[j] << "   tau ID:" << vMatchedRecoTauIdxs[j]<< std::endl;
 
     reco::PFTauRef iTau1( taus, vMatchedRecoTauIdxs[j] );
-    // if (!((*MuonRejection)[iTau1])) continue;
-    // if (!((*ElectronRejectionMVA6)[iTau1])) continue;
+
+    /*for (const auto& electron : *ele) {
+		float tau_eledR = reco::deltaR(iTau1->eta(), iTau1->phi(), electron.eta(), electron.phi());
+            if (tau_eledR < 0.4) {
+		std::cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!! matched with electron " << tau_eledR;
+	        std::cout << " ele pt:" << electron.pt();	
+                isMatched = true;
+                break;
+            }
+        }
+        if (!isMatched) {
+            for (const auto& muon : *mus) {
+		    float tau_mudR = reco::deltaR(iTau1->eta(), iTau1->phi(), muon.eta(), muon.phi());
+               if (tau_mudR <0.4 ) {
+		       std::cout<<" matched with muon"<< tau_mudR;
+		       std::cout << " muon pt" << muon.pt();
+                    isMatched = true;
+                    break;
+                }
+            }
+        }
+	*/
+     //if (!((*MuonRejection)[iTau1])) continue;
+     //if (!((*ElectronRejectionMVA6)[iTau1])) continue;
     // if ( (*MVAIsolation)[iTau1] < tau_sel_mvaID ) continue;
 
      // if ((*boostedHPSPFTausTask)[iTau1]){
@@ -253,16 +287,26 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
   //if ( debug ) std::cout << " Taus passing MVA cut:" << vJetTau.size() << std::endl;
   if ( vJetTau.size() < 2 ) {
     hNpassed_MVA->Fill(0);
+    if(debug) std::cout << "MVA not passed" << std::endl;
     return false;
   }
   hNpassed_MVA->Fill(1);
+  if(debug) std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& VJetTau" << vJetTau.size() << std::endl;
 
+   if ( vJetTau.size() != 2 ){
+	hNpassed_2Tau->Fill(0);
+	return false;
+	}
+   hNpassed_2Tau->Fill(1);
+   
+   //hNpassed_2TauDr->Fill(0);
 
 
   std::vector<std::pair<unsigned int, unsigned int>> vecOf_jetTauPair;
 
   vecOf_jetTauPair.clear();
 
+  //int tau1tau2Dr = 0;
   // apply mass cuts on combination of two taus
   for ( unsigned int j = 0; j < vJetTau.size()-1; j++ ) {
     reco::PFTauRef iTau1( taus, vJetTau[j].recoTauIdxs );
@@ -277,7 +321,8 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
       float recotaudR = reco::deltaR( iTau1->eta(),iTau1->phi(), iTau2->eta(),iTau2->phi() );
 
       if(recotaudR > 0.5){
-
+	tau1tau2Dr++;
+	hNpassed_2TauDr->Fill(1);
 	if(debug) std::cout << "================         In Combination loop        ====================" << std::endl;
 	if(debug) std::cout<< " j: "<< j << " Tau1 pt:" << iTau1->pt() << "  eta:" << iTau1->eta() << "  k:" << k << "  tau2 pt: " << iTau2->pt() << "  eta:" << iTau2->eta() << std::endl;
 
@@ -356,6 +401,9 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 	} //mass cuts
 
       } // if recotau dr > 0.5
+	else {
+            hNpassed_2TauDr->Fill(0);		
+	}
     } //tau loop inside
   } //tau loop outside
 
@@ -392,14 +440,13 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 
 
   if(vJetTauCut.empty() || vJetIdxs.empty()){
-   hNpassed_mGG->Fill(0);
+   hNpassed_mTT->Fill(0);
    return false;
    }
 
-   hNpassed_mGG->Fill(1);
+   hNpassed_mTT->Fill(1);
 
-
-
+  //std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  tau1tau2Dr: "<< tau1tau2Dr << std::endl;
   if ( debug ) std::cout << " Matched jets " << nMatchedJets << std::endl;
   if ( debug ) std::cout << " >> has_jet_dijet_ditau: passed" << std::endl;
   return true;
