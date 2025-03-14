@@ -217,9 +217,6 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     edm::EDGetTokenT<reco::TrackCollection> trackCollectionT_;
     edm::EDGetTokenT<reco::VertexCollection> vertexCollectionT_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> secVertexCollectionT_;
-    edm::EDGetTokenT<edm::View<reco::Jet> > recoJetsT_;
-    edm::EDGetTokenT<reco::JetTagCollection> jetTagCollectionT_;
-    edm::EDGetTokenT<std::vector<reco::CandIPTagInfo> >    ipTagInfoCollectionT_;
     edm::EDGetTokenT<reco::PFMETCollection> metCollectionT_;
     edm::EDGetTokenT<reco::GsfElectronCollection> eleCollectionT_;
     edm::EDGetTokenT<reco::MuonCollection> muonCollectionT_;

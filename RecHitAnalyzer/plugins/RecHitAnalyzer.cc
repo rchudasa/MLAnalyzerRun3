@@ -57,10 +57,6 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   vertexCollectionT_      = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexCollection"));
   secVertexCollectionT_   = consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("secVertexCollection"));
 
-  recoJetsT_              = consumes<edm::View<reco::Jet> >(iConfig.getParameter<edm::InputTag>("recoJetsForBTagging"));
-  jetTagCollectionT_      = consumes<reco::JetTagCollection>(iConfig.getParameter<edm::InputTag>("jetTagCollection"));
-  ipTagInfoCollectionT_   = consumes<std::vector<reco::CandIPTagInfo> > (iConfig.getParameter<edm::InputTag>("ipTagInfoCollection"));
-
   siPixelRecHitCollectionT_ = consumes<SiPixelRecHitCollection>(iConfig.getParameter<edm::InputTag>("siPixelRecHitCollection"));
 
   //siStripRecHitCollectionT_ = consumes<SiStripRecHit2DCollection>(iConfig.getParameter<std::vector<edm::InputTag> >("siStripRecHitCollection"));

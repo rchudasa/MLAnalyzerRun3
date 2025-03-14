@@ -42,8 +42,6 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
     , siStripUnmatchedStereoRecHits  = cms.InputTag("siStripMatchedRecHits", "stereoRecHitUnmatched")
     , pfCollection                   = cms.InputTag("particleFlow")
     , srcPFCandidates                = cms.InputTag("particleFlow")
-    , recoJetsForBTagging            = cms.InputTag("ak4PFJetsCHS")
-    , jetTagCollection               = cms.InputTag("pfCombinedInclusiveSecondaryVertexV2BJetTags")
     , srcPfJets                      = cms.InputTag("ak4PFJets")
     , metCollection                  = cms.InputTag("pfMet")
     , eleCollection                  = cms.InputTag("gedGsfElectrons")
@@ -66,7 +64,6 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
 
     , triggerResultsTag              = cms.InputTag("TriggerResults", "", "HLT")
     , triggerSummaryTag              = cms.InputTag("hltTriggerSummaryAOD","","HLT")
-    , ipTagInfoCollection            = cms.InputTag("pfImpactParameterTagInfos")
     , mode                           = cms.string("JetLevel")
     , rhoLabel                       = cms.InputTag('fixedGridRhoAll')
     , srcJetSF                       = cms.string('AK4PFchs')
