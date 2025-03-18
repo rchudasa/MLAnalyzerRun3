@@ -23,7 +23,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100),
+    input = cms.untracked.int32(-1),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
@@ -58,7 +58,7 @@ process.options = cms.untracked.PSet(
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(0),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(1),
+    numberOfThreads = cms.untracked.uint32(4),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -84,9 +84,9 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     dropMetaData = cms.untracked.string('ALL'),
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
-    fileName = cms.untracked.string('file:step4_HAA4Tau_3p7_MiniAOD.root'),
+    fileName = cms.untracked.string('file:step4_HAA4Tau_3p7_MiniAOD_allevent.root'),
     #outputCommands = process.MINIAODSIMEventContent.outputCommands,
-    outputCommands = process.AODSIMEventContent.outputCommands+cms.untracked.vstring(
+    outputCommands = process.MINIAODSIMEventContent.outputCommands+cms.untracked.vstring(
 	'keep *_simSiPixelDigis_*_*',
 	'keep *_simSiStripDigis_*_*',
 	'keep *_siPixelClusters_*_*',

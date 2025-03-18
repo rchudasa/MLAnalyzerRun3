@@ -91,7 +91,7 @@ process.hltFilter = cms.EDFilter("HLTHighLevel",
 
 process.p = cms.Path(
 process.siStripMatchedRecHits*process.siPixelRecHits*process.MeasurementTrackerEvent*process.TrackRefitter*
-#process.hltFilter*
+process.hltFilter*
  #process.hltanalysis*
  # process.patDefaultSequence*
 process.fevt

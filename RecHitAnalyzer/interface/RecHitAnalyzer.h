@@ -149,6 +149,17 @@
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/GenericParticle.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/Lepton.h"
+#include "DataFormats/PatCandidates/interface/Isolation.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+
 #include "TH1.h"
 #include "TH1F.h"
 #include "TH2.h"
@@ -210,23 +221,15 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     edm::EDGetTokenT<HBHERecHitCollection> HBHERecHitCollectionT_;
     edm::EDGetTokenT<TrackingRecHitCollection> TRKRecHitCollectionT_;
     edm::EDGetTokenT<reco::GenParticleCollection> genParticleCollectionT_;
-    edm::EDGetTokenT<reco::PhotonCollection> photonCollectionT_;
-    edm::EDGetTokenT<reco::PFJetCollection> jetCollectionT_;
-    edm::EDGetTokenT<edm::View<reco::Jet> > pfjetsToken_;
+    edm::EDGetTokenT<pat::JetCollection> jetCollectionT_;
+    //edm::EDGetTokenT<edm::View<reco::Jet> > pfjetsToken_;
     edm::EDGetTokenT<reco::GenJetCollection> genJetCollectionT_;
     edm::EDGetTokenT<reco::TrackCollection> trackCollectionT_;
     edm::EDGetTokenT<reco::VertexCollection> vertexCollectionT_;
     edm::EDGetTokenT<reco::VertexCompositePtrCandidateCollection> secVertexCollectionT_;
-    edm::EDGetTokenT<reco::PFMETCollection> metCollectionT_;
-    edm::EDGetTokenT<reco::GsfElectronCollection> eleCollectionT_;
-    edm::EDGetTokenT<reco::MuonCollection> muonCollectionT_;
-
-    edm::EDGetTokenT<reco::PFTauCollection> tauCollectionT_;
-    edm::EDGetTokenT<reco::PFTauDiscriminator> tauDiscriminatorT_;
-    edm::EDGetTokenT<reco::PFTauDiscriminator> tauDecayMode_;
-    edm::EDGetTokenT<reco::PFTauDiscriminator> tauMVAIsolation_;
-    edm::EDGetTokenT<reco::PFTauDiscriminator> tauMuonRejection_;
-    edm::EDGetTokenT<reco::PFTauDiscriminator> tauElectronRejectionMVA6_;
+    //edm::EDGetTokenT<std::vector<reco::CandIPTagInfo> >    ipTagInfoCollectionT_;
+    edm::EDGetTokenT<pat::METCollection> metCollectionT_;
+    edm::EDGetTokenT<pat::TauCollection> tauCollectionT_;
 
     // edm::EDGetTokenT<reco::PFTauDiscriminator> boostedHPSPFTausTask_; // Boosted tau discriminator
 
@@ -240,21 +243,19 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::string jetResPtType_;   //to set
     std::string jetResPhiType_;  //to set
 
-    std::vector<edm::EDGetTokenT<edm::View<reco::Candidate> > > lepTokens_;
+    //std::vector<edm::EDGetTokenT<edm::View<reco::Candidate> > > lepTokens_;
 
-    typedef std::vector<reco::PFCandidate>  PFCollection;
-    edm::EDGetTokenT<PFCollection> pfCollectionT_;
+    //typedef std::vector<reco::PFCandidate>  PFCollection;
+    //edm::EDGetTokenT<PFCollection> pfCollectionT_;
 
-    edm::EDGetTokenT<edm::View<reco::Candidate> > pfCandidatesToken_;
+    //edm::EDGetTokenT<edm::View<reco::Candidate> > pfCandidatesToken_;
 
-    metsig::METSignificance* metSigAlgo_;
+    //metsig::METSignificance* metSigAlgo_;
 
     edm::EDGetTokenT<SiPixelRecHitCollection> siPixelRecHitCollectionT_;
     edm::EDGetTokenT<SiStripMatchedRecHit2DCollection> siStripMatchedRecHitCollectionT_;
     edm::EDGetTokenT<SiStripRecHit2DCollection> siStripRPhiRecHitCollectionT_;
-    edm::EDGetTokenT<SiStripRecHit2DCollection> siStripUnmatchedRPhiRecHitCollectionT_;
     edm::EDGetTokenT<SiStripRecHit2DCollection> siStripStereoRecHitCollectionT_;
-    edm::EDGetTokenT<SiStripRecHit2DCollection> siStripUnmatchedStereoRecHitCollectionT_;
 
     edm::ESInputTag transientTrackBuilderT_;
     edm::ESGetToken<TransientTrackBuilder, TransientTrackRecord> transTrackBToken_;
@@ -263,10 +264,10 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     edm::ESGetToken<CaloGeometry, CaloGeometryRecord> caloGeomToken_;
     edm::ESGetToken<MagneticField, IdealMagneticFieldRecord> magfieldToken_;
 
-    edm::ESGetToken<JME::JetResolutionObject, JetResolutionScaleFactorRcd> jetResScaleFactorToken_;
+    /*edm::ESGetToken<JME::JetResolutionObject, JetResolutionScaleFactorRcd> jetResScaleFactorToken_;
     edm::ESGetToken<JME::JetResolutionObject, JetResolutionRcd> jetResPtToken_;
     edm::ESGetToken<JME::JetResolutionObject, JetResolutionRcd> jetResPhiToken_;
-
+*/
 
     edm::ESGetToken<TrackerTopology, TrackerTopologyRcd> tTopoToken_;
     edm::ESGetToken<TrackerGeometry, TrackerDigiGeometryRecord> tkGeomToken_;
@@ -302,13 +303,10 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     void branchesHCALatEBEE     ( TTree*, edm::Service<TFileService>& );
     void branchesTracksAtEBEE   ( TTree*, edm::Service<TFileService>& );
     void branchesTracksAtECALstitched   ( TTree*, edm::Service<TFileService>& );
-    void branchesPFCandsAtEBEE   ( TTree*, edm::Service<TFileService>& );
-    void branchesPFCandsAtECALstitched   ( TTree*, edm::Service<TFileService>& );
     void branchesTRKlayersAtEBEE( TTree*, edm::Service<TFileService>& );
     //void branchesTRKlayersAtECAL( TTree*, edm::Service<TFileService>& );
     void branchesTRKvolumeAtEBEE( TTree*, edm::Service<TFileService>& );
     //void branchesTRKvolumeAtECAL( TTree*, edm::Service<TFileService>& );
-    void branchesJetInfoAtECALstitched   ( TTree*, edm::Service<TFileService>& );
     void branchesTRKlayersAtECALstitched( TTree*, edm::Service<TFileService>& );
     void branchesScalarInfo( TTree*, edm::Service<TFileService>& );
 
@@ -323,22 +321,18 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     void fillTracksAtEBEE   ( const edm::Event&, const edm::EventSetup& );
     void fillTracksAtECALstitched   ( const edm::Event&, const edm::EventSetup&, unsigned int proj );
     //void fillTracksAtECALstitched   ( const edm::Event&, const edm::EventSetup& );
-    void fillPFCandsAtEBEE   ( const edm::Event&, const edm::EventSetup& );
-    void fillPFCandsAtECALstitched   ( const edm::Event&, const edm::EventSetup& );
     void fillTRKlayersAtEBEE( const edm::Event&, const edm::EventSetup& );
     //void fillTRKlayersAtECAL( const edm::Event&, const edm::EventSetup& );
     void fillTRKvolumeAtEBEE( const edm::Event&, const edm::EventSetup& );
     //void fillTRKvolumeAtECAL( const edm::Event&, const edm::EventSetup& );
-    void fillJetInfoAtECALstitched   ( const edm::Event&, const edm::EventSetup& );
     //void fillTRKlayersAtECALstitched( TTree*, edm::Service<TFileService>& );
     void fillTRKlayersAtECALstitched( const edm::Event&, const edm::EventSetup&, unsigned int proj );
     void fillScalarInfo( const edm::Event&, const edm::EventSetup& );
 
     // bool debug_;
-    const reco::PFCandidate* getPFCand(edm::Handle<PFCollection> pfCands, float eta, float phi, float& minDr, bool debug_ = false);
+    //const reco::PFCandidate* getPFCand(edm::Handle<PFCollection> pfCands, float eta, float phi, float& minDr, bool debug_ = false);
     const reco::Track* getTrackCand(edm::Handle<reco::TrackCollection> trackCands, float eta, float phi, float& minDr, bool debug_ = false);
     int   getTruthLabel(const reco::PFJetRef& recJet, edm::Handle<reco::GenParticleCollection> genParticles, float dRMatch = 0.4, bool debug_ = false);
-    float getBTaggingValue(const reco::PFJetRef& recJet, edm::Handle<edm::View<reco::Jet> >& recoJetCollection, edm::Handle<reco::JetTagCollection>& btagCollection, float dRMatch = 0.1, bool debug_= false );
 
     unsigned int getLayer(const DetId& detid, const TrackerTopology* tTopo);
 
@@ -350,42 +344,14 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     std::vector<int> vJetIdxs;
     std::vector<int> passedJetIdxs;
     void branchesEvtSel_jet_dijet      ( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_dijet_tau( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_dijet_top( TTree*, edm::Service<TFileService>& );
     void branchesEvtSel_jet_dijet_ditau( TTree*, edm::Service<TFileService>& );
     void branchesEvtSel_jet_dijet_ditau_h2aa4Tau( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_dijet_tau_massregression( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_dijet_ele_massregression( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_ele_classification( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_background( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_dijet_gg_qq( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_qcd( TTree*, edm::Service<TFileService>& );
-    void branchesEvtSel_jet_photonSel( TTree*, edm::Service<TFileService>& );
     bool runEvtSel_jet_dijet      ( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_dijet_tau( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_dijet_top( const edm::Event&, const edm::EventSetup& );
     bool runEvtSel_jet_dijet_ditau( const edm::Event&, const edm::EventSetup& );
     bool runEvtSel_jet_dijet_ditau_h2aa4Tau( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_dijet_tau_massregression( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_dijet_ele_massregression( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_ele_classification( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_background( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_dijet_gg_qq( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_qcd( const edm::Event&, const edm::EventSetup& );
-    bool runEvtSel_jet_photonSel( const edm::Event&, const edm::EventSetup& );
     void fillEvtSel_jet_dijet      ( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_dijet_tau( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_dijet_top( const edm::Event&, const edm::EventSetup& );
     void fillEvtSel_jet_dijet_ditau( const edm::Event&, const edm::EventSetup& );
     void fillEvtSel_jet_dijet_ditau_h2aa4Tau( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_dijet_tau_massregression( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_dijet_ele_massregression( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_ele_classification( const edm::Event&, const edm::EventSetup& );
-    //void fillEvtSel_jet_ele_classification( const edm::Event&, const edm::EventSetup&, std::vector<int>, std::vector<int> );
-    void fillEvtSel_jet_background( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_dijet_gg_qq( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_qcd( const edm::Event&, const edm::EventSetup& );
-    void fillEvtSel_jet_photonSel( const edm::Event&, const edm::EventSetup& );
 
     //functions for secondary vertices
     inline float catchInfs(const float& in, float replace_value=0){

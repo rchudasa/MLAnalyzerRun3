@@ -44,56 +44,47 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   	genParticleCollectionT_ = consumes<reco::GenParticleCollection>(iConfig.getParameter<edm::InputTag>("genParticleCollection"));
   }
 
-  photonCollectionT_      = consumes<reco::PhotonCollection>(iConfig.getParameter<edm::InputTag>("gedPhotonCollection"));
-  jetCollectionT_         = consumes<reco::PFJetCollection>(iConfig.getParameter<edm::InputTag>("ak4PFJetCollection"));
-  pfjetsToken_            = consumes<edm::View<reco::Jet> >(iConfig.getParameter<edm::InputTag>("srcPfJets"));
+  jetCollectionT_         = consumes<pat::JetCollection>(iConfig.getParameter<edm::InputTag>("ak4PFJetCollection"));
+  //pfjetsToken_            = consumes<edm::View<reco::Jet> >(iConfig.getParameter<edm::InputTag>("srcPfJets"));
   genJetCollectionT_      = consumes<reco::GenJetCollection>(iConfig.getParameter<edm::InputTag>("genJetCollection"));
   trackCollectionT_       = consumes<reco::TrackCollection>(iConfig.getParameter<edm::InputTag>("trackCollection"));
 
-  pfCollectionT_          = consumes<PFCollection>(iConfig.getParameter<edm::InputTag>("pfCollection"));
+  //pfCollectionT_          = consumes<PFCollection>(iConfig.getParameter<edm::InputTag>("pfCollection"));
 
-  pfCandidatesToken_      = consumes<edm::View<reco::Candidate> >(iConfig.getParameter<edm::InputTag>("srcPFCandidates"));
+  //pfCandidatesToken_      = consumes<edm::View<reco::Candidate> >(iConfig.getParameter<edm::InputTag>("srcPFCandidates"));
 
   vertexCollectionT_      = consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertexCollection"));
   secVertexCollectionT_   = consumes<reco::VertexCompositePtrCandidateCollection>(iConfig.getParameter<edm::InputTag>("secVertexCollection"));
+
+ //ipTagInfoCollectionT_   = consumes<std::vector<reco::CandIPTagInfo> > (iConfig.getParameter<edm::InputTag>("ipTagInfoCollection"));
 
   siPixelRecHitCollectionT_ = consumes<SiPixelRecHitCollection>(iConfig.getParameter<edm::InputTag>("siPixelRecHitCollection"));
 
   //siStripRecHitCollectionT_ = consumes<SiStripRecHit2DCollection>(iConfig.getParameter<std::vector<edm::InputTag> >("siStripRecHitCollection"));
   siStripMatchedRecHitCollectionT_ = consumes<SiStripMatchedRecHit2DCollection>(iConfig.getParameter<edm::InputTag>("siStripMatchedRecHitCollection"));
   siStripRPhiRecHitCollectionT_    = consumes<SiStripRecHit2DCollection>(iConfig.getParameter<edm::InputTag>("siStripRphiRecHits"));
-  siStripUnmatchedRPhiRecHitCollectionT_ = consumes<SiStripRecHit2DCollection>(iConfig.getParameter<edm::InputTag>("siStripUnmatchedRphiRecHits"));
   siStripStereoRecHitCollectionT_  = consumes<SiStripRecHit2DCollection>(iConfig.getParameter<edm::InputTag>("siStripStereoRecHits"));
-  siStripUnmatchedStereoRecHitCollectionT_  = consumes<SiStripRecHit2DCollection>(iConfig.getParameter<edm::InputTag>("siStripUnmatchedStereoRecHits"));
 
-  metCollectionT_           = consumes<reco::PFMETCollection>(iConfig.getParameter<edm::InputTag>("metCollection"));
+  metCollectionT_           = consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metCollection"));
 
-  tauCollectionT_           = consumes<reco::PFTauCollection>(iConfig.getParameter<edm::InputTag>("tauCollection"));
-  tauDecayMode_             = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauDecayMode"));
-  tauMVAIsolation_          = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauMVAIsolationRaw"));
-  tauMuonRejection_         = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauMuonRejectionLoose"));
-  tauElectronRejectionMVA6_ = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("tauElectronRejectionMVA6VLoose"));
+  tauCollectionT_           = consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("tauCollection"));
 
-  // boostedHPSPFTausTask_ = consumes<reco::PFTauDiscriminator>(iConfig.getParameter<edm::InputTag>("boostedHPSPFTausTask"));
-
-  eleCollectionT_           = consumes<reco::GsfElectronCollection>(iConfig.getParameter<edm::InputTag>("eleCollection"));
-  muonCollectionT_          = consumes<reco::MuonCollection>(iConfig.getParameter<edm::InputTag>("muonCollection"));
 
   processName_              = iConfig.getUntrackedParameter<std::string>("processName","HLT");
   //triggerResultsToken_      = consumes<edm::TriggerResults> (iConfig.getUntrackedParameter<edm::InputTag>("triggerResultsTag", edm::InputTag("TriggerResults", "", "HLT")));
   triggerResultsToken_      = consumes<edm::TriggerResults> (iConfig.getParameter<edm::InputTag>("triggerResultsTag"));
   triggerSummaryToken_      = consumes<trigger::TriggerEvent>(iConfig.getParameter<edm::InputTag>("triggerSummaryTag"));
-  jetSFType_                = iConfig.getParameter<std::string>("srcJetSF");
-  jetResPtType_             = iConfig.getParameter<std::string>("srcJetResPt");
-  jetResPhiType_            = iConfig.getParameter<std::string>("srcJetResPhi");
-  rhoLabel_                 = consumes<double>(iConfig.getParameter<edm::InputTag>("rhoLabel"));
+  //jetSFType_                = iConfig.getParameter<std::string>("srcJetSF");
+  //jetResPtType_             = iConfig.getParameter<std::string>("srcJetResPt");
+  //jetResPhiType_            = iConfig.getParameter<std::string>("srcJetResPhi");
+  //rhoLabel_                 = consumes<double>(iConfig.getParameter<edm::InputTag>("rhoLabel"));
 
-  std::vector<edm::InputTag> srcLeptonsTags        = iConfig.getParameter< std::vector<edm::InputTag> >("srcLeptons");
-  for(std::vector<edm::InputTag>::const_iterator it=srcLeptonsTags.begin();it!=srcLeptonsTags.end();it++) {
-    lepTokens_.push_back( consumes<edm::View<reco::Candidate> >( *it ) );
-  }
+  //std::vector<edm::InputTag> srcLeptonsTags        = iConfig.getParameter< std::vector<edm::InputTag> >("srcLeptons");
+  //for(std::vector<edm::InputTag>::const_iterator it=srcLeptonsTags.begin();it!=srcLeptonsTags.end();it++) {
+  //  lepTokens_.push_back( consumes<edm::View<reco::Candidate> >( *it ) );
+ // }
 
-  metSigAlgo_               = new metsig::METSignificance(iConfig);
+  //metSigAlgo_               = new metsig::METSignificance(iConfig);
 
 
   transientTrackBuilderT_ = iConfig.getParameter<edm::ESInputTag>("transTrackBuilder");
@@ -104,9 +95,10 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   caloGeomToken_ = esConsumes<CaloGeometry, CaloGeometryRecord>();
   magfieldToken_ = esConsumes<MagneticField, IdealMagneticFieldRecord>();
 
-  jetResScaleFactorToken_ = esConsumes<JME::JetResolutionObject, JetResolutionScaleFactorRcd>(edm::ESInputTag("", jetSFType_));
+  /*jetResScaleFactorToken_ = esConsumes<JME::JetResolutionObject, JetResolutionScaleFactorRcd>(edm::ESInputTag("", jetSFType_));
   jetResPtToken_ = esConsumes<JME::JetResolutionObject, JetResolutionRcd>(edm::ESInputTag("", jetResPtType_));
   jetResPhiToken_ = esConsumes<JME::JetResolutionObject, JetResolutionRcd>(edm::ESInputTag("", jetResPhiType_));
+*/
 
   tTopoToken_ = esConsumes<TrackerTopology, TrackerTopologyRcd>();
   tkGeomToken_ = esConsumes<TrackerGeometry, TrackerDigiGeometryRecord>();
@@ -187,13 +179,10 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   branchesHCALatEBEE   ( RHTree, fs );
   branchesTracksAtEBEE(RHTree, fs);
   branchesTracksAtECALstitched( RHTree, fs);
-  branchesPFCandsAtEBEE(RHTree, fs);
-  branchesPFCandsAtECALstitched( RHTree, fs);
   //branchesTRKlayersAtEBEE(RHTree, fs);
   //branchesTRKlayersAtECAL(RHTree, fs);
   //branchesTRKvolumeAtEBEE(RHTree, fs);
   //branchesTRKvolumeAtECAL(RHTree, fs);
-  branchesJetInfoAtECALstitched( RHTree, fs);
   branchesScalarInfo( RHTree, fs);
   branchesTRKlayersAtECALstitched(RHTree, fs);
 
@@ -207,7 +196,7 @@ RecHitAnalyzer::~RecHitAnalyzer()
 
   // do anything here that needs to be done at desctruction time
   // (e.g. close files, deallocate resources etc.)
-  delete metSigAlgo_;  //FIXME
+ // delete metSigAlgo_;  //FIXME
 }
 //
 // member functions
@@ -249,13 +238,10 @@ RecHitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   {
     fillTracksAtECALstitched( iEvent, iSetup, i );
   }
-  fillPFCandsAtEBEE( iEvent, iSetup );
-  fillPFCandsAtECALstitched( iEvent, iSetup );
   //fillTRKlayersAtEBEE( iEvent, iSetup );
   //fillTRKlayersAtECAL( iEvent, iSetup );
   //fillTRKvolumeAtEBEE( iEvent, iSetup );
   //fillTRKvolumeAtECAL( iEvent, iSetup );
-  fillJetInfoAtECALstitched( iEvent, iSetup );
   fillScalarInfo( iEvent, iSetup );
   for (unsigned int i=0;i<Nhitproj;i++)
   {
@@ -306,7 +292,7 @@ RecHitAnalyzer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //desc.addUntracked<edm::InputTag>("tracks","ctfWithMaterialTracks");
   //descriptions.addDefault(desc);
 }
-
+/*
 const reco::PFCandidate*
 RecHitAnalyzer::getPFCand(edm::Handle<PFCollection> pfCands, float eta, float phi, float& minDr, bool debug ) {
 
@@ -332,7 +318,7 @@ RecHitAnalyzer::getPFCand(edm::Handle<PFCollection> pfCands, float eta, float ph
 
   return minDRCand;
 }
-
+*/
 const reco::Track*
 RecHitAnalyzer::getTrackCand(edm::Handle<reco::TrackCollection> trackCands, float eta, float phi, float& minDr, bool debug ) {
 
@@ -386,43 +372,6 @@ int RecHitAnalyzer::getTruthLabel(const reco::PFJetRef& recJet, edm::Handle<reco
     return iGen->pdgId();
 
   } // gen particles
-
-  return -99;
-}
-
-
-float RecHitAnalyzer::getBTaggingValue(const reco::PFJetRef& recJet, edm::Handle<edm::View<reco::Jet> >& recoJetCollection, edm::Handle<reco::JetTagCollection>& btagCollection, float dRMatch, bool debug ){
-
-  // loop over jets
-  for( edm::View<reco::Jet>::const_iterator jetToMatch = recoJetCollection->begin(); jetToMatch != recoJetCollection->end(); ++jetToMatch )
-    {
-      reco::Jet thisJet = *jetToMatch;
-      float dR = reco::deltaR( recJet->eta(),recJet->phi(), thisJet.eta(),thisJet.phi() );
-      if(dR > 0.1) continue;
-
-      size_t idx = (jetToMatch - recoJetCollection->begin());
-      edm::RefToBase<reco::Jet> jetRef = recoJetCollection->refAt(idx);
-
-      if(debug) std::cout << "btag discriminator value = " << (*btagCollection)[jetRef] << std::endl;
-      return (*btagCollection)[jetRef];
-
-    }
-
-  if(debug){
-    std::cout << "ERROR  No btag match: " << std::endl;
-
-    // loop over jets
-    for( edm::View<reco::Jet>::const_iterator jetToMatch = recoJetCollection->begin(); jetToMatch != recoJetCollection->end(); ++jetToMatch )
-      {
-	const reco::Jet thisJet = *jetToMatch;
-	std::cout << "\t Match attempt pt: " <<  thisJet.pt() << " vs " <<  recJet->pt()
-		  << " eta: " << thisJet.eta() << " vs " << recJet->eta()
-		  << "phi: "<< thisJet.phi() << " vs " << recJet->phi()
-		  << std::endl;
-	float dR = reco::deltaR( recJet->eta(),recJet->phi(), thisJet.eta(),thisJet.phi() );
-	std::cout << "dR " << dR << std::endl;
-      }
-  }
 
   return -99;
 }
