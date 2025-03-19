@@ -84,7 +84,7 @@ process.hltFilter = cms.EDFilter("HLTHighLevel",
                                           #HLTPaths = cms.vstring('HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*'),
                                           #HLTPaths = cms.vstring('HLT_PFHT280_QuadPFJet30*'),
                                           #HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*'),
-                                          HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1*'),
+                                          HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*','HLT_PFMET*'),
                                           andOr = cms.bool(True),
                                           throw = cms.bool(False)
                                           )

@@ -58,12 +58,14 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau_h2aa4Tau ( const edm::Event& iEve
 for ( unsigned int iG = 0; iG < genParticles->size(); iG++ ) {
 
     reco::GenParticleRef iGen( genParticles, iG );
-    if ( std::abs(iGen->pdgId()) != 25 ) continue;
-    if ( iGen->numberOfDaughters() != 2 ) continue;
-    if ( abs(iGen->daughter(0)->pdgId()) != 15 || abs(iGen->daughter(1)->pdgId()) != 15 ) continue;
+    if (  isSignal_ && !( std::abs(iGen->pdgId()) == 15 && iGen->status() == 2 ) ) continue;
+
+    //if ( std::abs(iGen->pdgId()) != 25 ) continue;
+    //if ( iGen->numberOfDaughters() != 2 ) continue;
+    //if ( abs(iGen->daughter(0)->pdgId()) != 15 || abs(iGen->daughter(1)->pdgId()) != 15 ) continue;
 
     if(debug)std::cout<<"*****************************************************"<< std::endl;
-    if(debug)std::cout<< "iG:" << iG << " ID:" << iGen->pdgId() << " A mass:" << iGen->mass() << std::endl;
+    if(debug)std::cout<< "iG:" << iG << " ID:" << iGen->pdgId() << " tau mass:" << iGen->mass() << std::endl;
     gen_obj Gen_obj = { iG, std::abs(iGen->pt()) };
     vATaus.push_back( Gen_obj );
     vH += iGen->p4();

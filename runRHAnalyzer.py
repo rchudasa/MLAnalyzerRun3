@@ -2,7 +2,7 @@ import os
 
 #cfg='RecHitAnalyzer/python/ConfFile_data_cfg.py'
 cfg='RecHitAnalyzer/python/ConfFile_cfg.py'
-inputFiles_='file:step4_HAA4Tau_3p7_MiniAOD_100event.root'
+inputFiles_='file:step4_HAA4Tau_3p7_MiniAOD_allevent.root'
 #inputFiles_='file:/eos/cms/store/group/phys_diffraction/rchudasa/MCGeneration/HToAATo4Tau_hadronic_tauDecay_M3p7_Run3_2023/3p7_AODSIM_hadronic/240930_055332/0000/step3_AODSIM_100.root'
 #inputFiles_='root://cmseos.fnal.gov//store/group/lpcml/rchudasa/MCGenerationRun3/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/HTauTau_AODSIM_oneBlock/241115_165719/0000/step3_AODSIM_117.root'
 #inputFiles_='root://cmseos.fnal.gov//store/group/lpcml/rchudasa/MCGenerationRun3/HToAATo4Tau_hadronic_tauDecay_M3p7_Run3_2023/3p7_AODSIM_newBigProd/250113_144409/0000/step3_AODSIM_2.root'

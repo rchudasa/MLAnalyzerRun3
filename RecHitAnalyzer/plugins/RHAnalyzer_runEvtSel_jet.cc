@@ -89,9 +89,12 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   */
   int hltAccept = -1;
   //std::string trgName = "HLT_PFHT280_QuadPFJet30_v1";
-  std::string trgName = "HLT_DoubleMediumDeepTauPFTauHPS*";
-  //std::string trgName = "HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1*";
-  std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgName );
+  std::string trgName1 = "HLT_DoubleMediumDeepTauPFTauHPS*";
+  std::string trgName2 = "HLT_PFMET*";
+
+  std::string trgPattern = "(" + trgName1 + "|" + trgName2 + ")";
+  std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgPattern );
+  //std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgName );
   if(debug)std::cout << " N matches: " << trgMatches.size() << std::endl;
 
   if ( !trgMatches.empty() ) {

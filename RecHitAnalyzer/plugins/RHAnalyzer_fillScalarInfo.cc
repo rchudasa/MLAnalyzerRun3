@@ -37,7 +37,7 @@ void RecHitAnalyzer::branchesScalarInfo ( TTree* tree, edm::Service<TFileService
 // Fill Scalar information _________________________________________________________________//
 void RecHitAnalyzer::fillScalarInfo ( const edm::Event& iEvent, const edm::EventSetup& iSetup ) {
 
-  edm::Handle<reco::PFMETCollection> pfmet;
+  edm::Handle<pat::METCollection> pfmet;
   iEvent.getByToken(metCollectionT_, pfmet);
 
   edm::Handle<reco::VertexCollection> vertices;
@@ -55,16 +55,17 @@ void RecHitAnalyzer::fillScalarInfo ( const edm::Event& iEvent, const edm::Event
    vVtx_y_.clear();
    vVtx_z_.clear();
 
+   const pat::MET &met = pfmet->front();
    // Fill scalar information
-    vMET_sumET_ .push_back((pfmet->front()).sumEt());
-    vMET_pt_   .push_back((pfmet->front()).pt());
-    vMET_phi_   .push_back((pfmet->front()).phi());
-    vMET_px_    .push_back((pfmet->front()).px());
-    vMET_py_    .push_back((pfmet->front()).py());
-    vMET_pz_    .push_back((pfmet->front()).pz());
+    vMET_sumET_ .push_back(met.sumEt());
+    vMET_pt_   .push_back(met.pt());
+    vMET_phi_   .push_back(met.phi());
+    vMET_px_    .push_back(met.px());
+    vMET_py_    .push_back(met.py());
+    vMET_pz_    .push_back(met.pz());
 
-    if( debug) std::cout << "Met sumet " << (pfmet->front()).sumEt() << std::endl;
-    if( debug) std::cout << "Met pt " << (pfmet->front()).pt() << std::endl;
+    if( debug) std::cout << "Met sumet " << met.sumEt() << std::endl;
+    if( debug) std::cout << "Met pt " << met.pt() << std::endl;
 
     unsigned int goodVertices = 0;
 
