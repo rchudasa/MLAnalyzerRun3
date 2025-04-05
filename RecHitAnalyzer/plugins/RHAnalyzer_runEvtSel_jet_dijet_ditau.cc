@@ -175,6 +175,8 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 
         if ( debug ) std::cout << "   GEN particle " << iGenParticle << " -> status: " << iGen->status() << ", id: " << iGen->pdgId() << ", nDaught: " << iGen->numberOfDaughters() << " nMoms: " <<iGen->numberOfMothers() << " | pt: "<< iGen->pt() << " eta: " <<iGen->eta() << " phi: " <<iGen->phi() << " | dR: " << dR << std::endl;
 
+        if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << std::endl;
+
         bool isHadronic = true;
         if ( std::abs(iGen->pdgId()) == 15 ) {
           for (unsigned int iDaughter = 0; iDaughter != iGen->numberOfDaughters(); ++iDaughter ){
@@ -244,8 +246,8 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
         v_tightdeeptau.push_back( TightDeepTau );
         v_jetIsTau.push_back( JetIsTau );
 
-      }
-    } // End MC selection
+	}
+    } // is MC selection
 
   } // reco jets
   if ( debug ) std::cout << " Matched jets " << nMatchedJets << std::endl;

@@ -333,6 +333,7 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     //const reco::PFCandidate* getPFCand(edm::Handle<PFCollection> pfCands, float eta, float phi, float& minDr, bool debug_ = false);
     const reco::Track* getTrackCand(edm::Handle<reco::TrackCollection> trackCands, float eta, float phi, float& minDr, bool debug_ = false);
     int   getTruthLabel(const reco::PFJetRef& recJet, edm::Handle<reco::GenParticleCollection> genParticles, float dRMatch = 0.4, bool debug_ = false);
+    bool passTriggerPatternsAndGetName(edm::Handle<edm::TriggerResults> hltresults, edm::TriggerNames const& triggerNames, std::string pattern);
 
     unsigned int getLayer(const DetId& detid, const TrackerTopology* tTopo);
 

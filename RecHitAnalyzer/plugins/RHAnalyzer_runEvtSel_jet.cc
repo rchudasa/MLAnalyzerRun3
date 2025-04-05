@@ -16,7 +16,10 @@ unsigned long long jet_eventId_;
 vector<float> vJetSeed_iphi_;
 vector<float> vJetSeed_ieta_;
 vector<int>   vFailedJetIdx_;
-int hltAccept_;
+int hltAccept_doubleTau_;
+int hltAccept_pfmet_;
+int hltAccept_ak8Jet_;
+int hltAccept_pfht_;
 int HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_;
 int HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet60_;
 int HLT_DoubleMediumDeepTauPFTauHPS30_L2NN_eta2p1_PFJet75_;
@@ -37,7 +40,10 @@ TH1F * hNpassed_hlt;
 // Initialize branches _____________________________________________________//
 void RecHitAnalyzer::branchesEvtSel_jet ( TTree* tree, edm::Service<TFileService> &fs ) {
 
-  tree->Branch("hltAccept",      &hltAccept_);
+  tree->Branch("hltAccept_doubleTau", &hltAccept_doubleTau_);
+  tree->Branch("hltAccept_pfmet", &hltAccept_pfmet_);
+  tree->Branch("hltAccept_ak8Jet", &hltAccept_ak8Jet_);
+  tree->Branch("hltAccept_pfht", &hltAccept_pfht_);
   tree->Branch("eventId",        &jet_eventId_);
   tree->Branch("runId",          &jet_runId_);
   tree->Branch("HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1",          &HLT_DoubleMediumDeepTauPFTauHPS35_L2NN_eta2p1_);
@@ -48,7 +54,7 @@ void RecHitAnalyzer::branchesEvtSel_jet ( TTree* tree, edm::Service<TFileService
   tree->Branch("jetSeed_iphi",   &vJetSeed_iphi_);
   tree->Branch("jetSeed_ieta",   &vJetSeed_ieta_);
 
-  hNpassed_hlt      = fs->make<TH1F>("hNpassed_hlt", "isPassed;isPassed;N", 2, 0., 2);
+  hNpassed_hlt      = fs->make<TH1F>("hNpassed_hlt", "isPassed;isPassed;N", 10, 0., 10);
 
 
   // Fill branches in explicit jet selection
@@ -61,11 +67,70 @@ void RecHitAnalyzer::branchesEvtSel_jet ( TTree* tree, edm::Service<TFileService
 
 // Run event selection ___________________________________________________________________//
 bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventSetup& iSetup ) {
+   
+    /*edm::TriggerResultsByName tr = iEvent.triggerResultsByName("RECO");
+   if( !tr.isValid() ) return false;
+    std::string successfulPath="";
+   if( RecHitAnalyzer::passTriggerPatternsAndGetName(tr, successfulPath, "HLT_DoubleMediumDeepTauPFTauHPS*")){
+	   std::cout<<"************** Deeptau trigger by name passed"<<std::endl;
+   }*/
 
 
   edm::Handle<edm::TriggerResults> hltresults;
   iEvent.getByToken(triggerResultsToken_,hltresults);
+  
+  if (!hltresults.isValid()) {
+    std::cout << "!!! Error in getting TriggerResults product from Event !!!" << std::endl;
+    //triger_valid = false;
+  }
 
+  int ntrigs = hltresults->size();
+  edm::TriggerNames const& triggerNames = iEvent.triggerNames(*hltresults);
+
+  //if(debug)std::cout << " N triggers:" << ntrigs << std::endl;
+  std::string trgName1 = "HLT_DoubleMediumDeepTauPFTauHPS*";
+  std::string trgName2 = "HLT_PFMET*";
+  std::string trgName3 = "HLT_AK8PFJet5*";
+  std::string trgName4 = "HLT_AK8PFJet500_MassSD30*";
+  std::string trgName5 = "HLT_AK8PFJet400_MassSD30*";
+  std::string trgName6 = "HLT_AK8PFJet4*_SoftDropMass40*";
+  std::string trgName7 = "HLT_AK8PFJet2*_SoftDropMass40_PNetTauTau0p0*";
+  std::string trgName8 = "HLT_AK8DiPFJet2*0_2*0_MassSD*0";
+  std::string trgName9 = "HLT_PFHT*_PFMET*_PFMHT*_IDTight";
+
+  std::string trgPattern = "(" + trgName1 + "|" + trgName2 + "|" + trgName3 + "|" + trgName4 + "|" +
+    trgName5 + "|" + trgName6 + "|" + trgName7 + "|" + trgName8 + "|" + trgName9 + ")";
+  std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), trgPattern);
+  
+  //if (debug) std::cout << "N matches: " << trgMatches.size() << std::endl;
+ 
+
+  if (!trgMatches.empty()) {
+    for (auto const& iT : trgMatches) {
+      int trgIndex = triggerNames.triggerIndex(*iT);
+      if (hltresults->accept(trgIndex)) {
+        if (debug) std::cout << " name[" << trgIndex << "]:" << *iT << " -> " << hltresults->accept(trgIndex) << std::endl;
+      }//hltresult accept
+    }//loop on trigger matching the pattern
+  }//trigger matching is not empty
+
+  hltAccept_doubleTau_ =0; hltAccept_pfmet_=0; hltAccept_ak8Jet_=0;hltAccept_pfht_=0;
+  bool triggerFired =false;
+  if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_DoubleMediumDeepTauPFTauHPS*")){triggerFired=true; hltAccept_doubleTau_ = 1;hNpassed_hlt->Fill(1);}
+  if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_PFMET*")){triggerFired=true;hltAccept_pfmet_ = 1;hNpassed_hlt->Fill(2);}
+ 
+
+  std::string trgAK8Pattern = "(" + trgName3 + "|" + trgName4 + "|" +
+    trgName5 + "|" + trgName6 + "|" + trgName7 + "|" + trgName8 + ")";
+
+  if(passTriggerPatternsAndGetName(hltresults,triggerNames, trgAK8Pattern)){triggerFired=true; hltAccept_ak8Jet_ =1; hNpassed_hlt->Fill(3);}
+  
+  if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_PFHT*_PFMET*_PFMHT*_IDTight")){triggerFired=true; hltAccept_pfht_ = 1;hNpassed_hlt->Fill(4);}
+
+  // Ensure trigger acceptance
+  if (!triggerFired){hNpassed_hlt->Fill(0); return false;}
+ 
+/*
  //if(iEvent.id().event()<21930)return false;
   if (!hltresults.isValid()) {
    std::cout << "!!! Error in getting TriggerResults product from Event !!!" << std::endl;
@@ -77,50 +142,52 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
 
   if(debug)std::cout << " N triggers:" << ntrigs << std::endl;
 
-  //int passTrigger = 0;
-  /*for (int itrig = 0; itrig != ntrigs; ++itrig)
-    {
-   std::string trigName = triggerNames.triggerName(itrig);
-   // std::cout << ">>>>>>>>>>>>>>>>Available Trigger: " << trigName << std::endl;
-   bool accept = hltresults->accept(itrig);
-   if (!(accept)) continue;
-   std::cout << " Accept >>>>>>>>>>>>>>>>>>>>" << trigName << std::endl;
-    }
-  */
   int hltAccept = -1;
-  //std::string trgName = "HLT_PFHT280_QuadPFJet30_v1";
   std::string trgName1 = "HLT_DoubleMediumDeepTauPFTauHPS*";
   std::string trgName2 = "HLT_PFMET*";
+  std::string trgName3 = "HLT_AK8PFJet5*";
+  std::string trgName4 = "HLT_AK8PFJet500_MassSD30*";
+  std::string trgName5 = "HLT_AK8PFJet400_MassSD30*";
+  std::string trgName6 = "HLT_AK8PFJet4*_SoftDropMass40*";
+  std::string trgName7 = "HLT_AK8PFJet2*_SoftDropMass40_PNetTauTau0p0*";
+  std::string trgName8 = "HLT_AK8DiPFJet2*0_2*0_MassSD*0";
+  std::string trgName9 = "HLT_PFHT*_PFMET*_PFMHT*_IDTight";
 
-  std::string trgPattern = "(" + trgName1 + "|" + trgName2 + ")";
-  std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgPattern );
-  //std::vector< std::vector<std::string>::const_iterator > trgMatches = edm::regexMatch( triggerNames.triggerNames(), trgName );
-  if(debug)std::cout << " N matches: " << trgMatches.size() << std::endl;
-
-  if ( !trgMatches.empty() ) {
-    //std::vector<std::string>  HLTPathsByName_;
-    //    //std::vector<unsigned int> HLTPathsByIndex_;
-    hltAccept = 0;
-    for ( auto const& iT : trgMatches ) {
-	 if(debug)   std::cout << triggerNames.triggerIndex(*iT)<<"]:"<< *iT << std::endl;
-      //HLTPathsByName_.push_back( *iT );
-      //HLTPathsByIndex_.push_back( triggerNames.triggerIndex(*iT) );
-      if ( hltresults->accept(triggerNames.triggerIndex(*iT)) ){
-	    hltAccept = 1;
-            if(debug)std::cout << " name["<<triggerNames.triggerIndex(*iT)<<"]:"<< *iT << " -> " << hltresults->accept(triggerNames.triggerIndex(*iT)) << std::endl;
-      	  break;
-	}
-    }
-  }
-  if(debug)std::cout << "*************** hltAccept:" << hltAccept << std::endl;
-  hltAccept_ = hltAccept;
-  // Ensure trigger acceptance
-  if(hltAccept==1) {
-    hNpassed_hlt->Fill(1);
-  }
-  else hNpassed_hlt->Fill(0);
-  if ( hltAccept_ != 1 ) return false;
+  std::string trgPattern = "(" + trgName1 + "|" + trgName2 + "|" + trgName3 + "|" + trgName4 + "|" +
+    trgName5 + "|" + trgName6 + "|" + trgName7 + "|" + trgName8 + "|" + trgName9 + ")";
+  std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), trgPattern);
   
+  if (debug) std::cout << "N matches: " << trgMatches.size() << std::endl;
+ 
+
+  hltAccept = 0;
+  bool triggerFired = false;
+  
+  if (!trgMatches.empty()) {
+    for (auto const& iT : trgMatches) {
+      int trgIndex = triggerNames.triggerIndex(*iT);
+      if (hltresults->accept(trgIndex)) {
+	hltAccept = 1;
+	triggerFired = true;
+	
+	if (debug) std::cout << " name[" << trgIndex << "]:" << *iT << " -> " << hltresults->accept(trgIndex) << std::endl;
+      }//hltresult accept
+    }//loop on trigger matching the pattern
+  }//trigger matching is not empty
+  
+  // If no trigger passed, fill 0
+  if (!triggerFired) {
+    hNpassed_hlt->Fill(0);
+    if (debug) std::cout << "No trigger passed, filling histogram with value 0" << std::endl;
+  }
+  
+  if (debug) std::cout << "*************** hltAccept:" << hltAccept << std::endl;
+  
+  hltAccept_ = hltAccept;
+  
+  // Ensure trigger acceptance
+  if (hltAccept_ == 0) return false;
+  */
   // Each jet selection must fill vJetIdxs with good jet indices
   
   // Run explicit jet selection
@@ -129,7 +196,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
     hasPassed = runEvtSel_jet_dijet_ditau( iEvent, iSetup );
     if ( debug && hasPassed ) std::cout << "!!!!!!   JET SELECTION HAS PASSED! " << std::endl;
   } 
-
+  
   if ( !hasPassed ) return false;
   if (task_ == "dijet_ditau" && isMC_) runEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
 

@@ -344,6 +344,24 @@ RecHitAnalyzer::getTrackCand(edm::Handle<reco::TrackCollection> trackCands, floa
   return minDRCand;
 }
 
+bool RecHitAnalyzer::passTriggerPatternsAndGetName(edm::Handle<edm::TriggerResults> hltresults, edm::TriggerNames const& triggerNames, std::string pattern){
+  
+  
+  std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), pattern);
+  //if (debug) std::cout << "N matches: " << trgMatches.size() << std::endl;
+  
+  
+  if (!trgMatches.empty()) {
+    for (auto const& iT : trgMatches) {
+      int trgIndex = triggerNames.triggerIndex(*iT);
+      if (hltresults->accept(trgIndex)) {
+        if (debug) std::cout << " **********name[" << trgIndex << "]:" << *iT << " -> " << hltresults->accept(trgIndex) << std::endl;
+	return true;
+      }//hltresult accept
+    }//loop on trigger matching the pattern
+  }//trigger matching is not empty
+ return false; 
+}
 
 
 

@@ -84,7 +84,12 @@ process.hltFilter = cms.EDFilter("HLTHighLevel",
                                           #HLTPaths = cms.vstring('HLT_DoubleMediumChargedIsoPFTau40_Trk1_TightID_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau40_Trk1_eta2p1_Reg_v*','HLT_DoubleTightChargedIsoPFTau35_Trk1_TightID_eta2p1_Reg_v*'),
                                           #HLTPaths = cms.vstring('HLT_PFHT280_QuadPFJet30*'),
                                           #HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*'),
-                                          HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*','HLT_PFMET*'),
+                                 
+                                 
+                                          HLTPaths=cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*','HLT_PFMET*','HLT_AK8PFJet5*','HLT_AK8PFJet500_MassSD30*','HLT_AK8PFJet400_MassSD30*','HLT_AK8PFJet4*_SoftDropMass40*','HLT_AK8PFJet2*_SoftDropMass40_PNetTauTau0p0*','HLT_AK8DiPFJet2*0_2*0_MassSD*0','HLT_PFHT*_PFMET*_PFMHT*_IDTight'),
+
+                                          #HLTPaths = cms.vstring('HLT_AK8PFJet*_MassSD30*','HLT_AK8PFJet*_SoftDropMass40*','HLT_DoubleMediumDeepTauPFTauHPS*','HLT_PFMET*'),
+                                          #HLTPaths = cms.vstring('HLT_DoubleMediumDeepTauPFTauHPS*','HLT_PFMET*','HLT_AK8PFJet*','HLT_AK8DiPFJet*'),
                                           andOr = cms.bool(True),
                                           throw = cms.bool(False)
                                           )
