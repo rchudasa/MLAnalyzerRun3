@@ -5,6 +5,22 @@ using std::vector;
 const unsigned nJets = 50; //TODO: use cfg level nJets_
 TH1F *hNpassed_genJetMatch; 
 TH1F *hNpassed_minTwoJets; 
+TH1F *hNpassed_leptonVeto; 
+TH1F *hNpassed_hbheCrop; 
+
+//gen variables
+vector<float> v_att_genHiggs_M_;
+vector<float> v_att_genPS_M_;
+vector<float> v_att_genTau_pT_;
+
+//jet variables
+int v_att_tau_njet_;
+vector<float> v_att_tau_jet_m0_;
+vector<float> v_att_tau_jet_pt_;
+vector<float> v_att_tau_jet_eta_;
+vector<float> v_att_tau_jet_phi_;
+vector<float> v_att_tau_jetIsSignal_;
+vector<float> v_att_tau_jetdR_;
 
 
 std::vector<int> jetIDs_;                          // jet index or unique ID
@@ -15,6 +31,16 @@ void RecHitAnalyzer::branchesEvtSel_jet_dijet_ditau ( TTree* tree, edm::Service<
 
   hNpassed_genJetMatch = fs->make<TH1F>("hNpassed_genJetMatch","Jet matched to gen particle (0: No, 1: Yes)", 2, 0, 2);
   hNpassed_minTwoJets  = fs->make<TH1F>("hNpassed_minTwoJets","Atleast two jets in the event (0: No, 1: Yes)", 2, 0, 2);
+  hNpassed_leptonVeto  = fs->make<TH1F>("hNpassed_leptonVeto","Veto lepton jets in the event (0: No, 1: Yes)", 2, 0, 2);
+  hNpassed_hbheCrop   = fs->make<TH1F>("hNpassed_hbheCrop","Jets in the events passing HB-HE edge cut (0: No, 1: Yes)", 2, 0, 2);
+
+  //jet variables
+  tree->Branch("nJets",            &v_att_tau_njet_);
+  tree->Branch("jetM",             &v_att_tau_jet_m0_);
+  tree->Branch("jetPt",            &v_att_tau_jet_pt_);
+  tree->Branch("jetEta",           &v_att_tau_jet_eta_);
+  tree->Branch("jetPhi",           &v_att_tau_jet_phi_);
+  tree->Branch("jetIsSignal",      &v_att_tau_jetIsSignal_);
 
 } // branchesEvtSel_jet_dijet_tau()
 
@@ -70,7 +96,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
     pat::Jet iJet = (*jets)[iJ];
     if ( std::abs(iJet.pt())  < minJetPt_ ) continue;
     if ( std::abs(iJet.eta()) > maxJetEta_ ) continue;
-    if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << std::endl;
+    if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << " ,mass: "<< iJet.mass()<<  std::endl;
     if (isMC_) {
       //bool passedGenSel = false;
       unsigned int iGenParticle = 0;
@@ -148,19 +174,19 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
   }
   hNpassed_minTwoJets->Fill(1);
 
-   for (size_t i = 0; i < jetIDs_.size(); ++i) {
-    std::cout << "********************Jet ID: " << jetIDs_[i] << " matched to GenParticles IDs: ";
+  for (size_t i = 0; i < jetIDs_.size(); ++i) {
+    if(debug)std::cout << "********************Jet ID: " << jetIDs_[i] << " matched to GenParticles IDs: ";
     vJetIdxs.push_back(jetIDs_[i]);
     for (size_t j = 0; j < matchedGenIDs_[i].size(); ++j) {
-      std::cout << matchedGenIDs_[i][j];
-      if (j != matchedGenIDs_[i].size() - 1) std::cout << ", ";
+      if(debug)std::cout << matchedGenIDs_[i][j];
+      if (j != matchedGenIDs_[i].size() - 1) { if(debug)std::cout << ", ";}
     }
-    std::cout << std::endl;
+    if(debug)std::cout << std::endl;
   }
 
- if(vJetIdxs.empty()){
-	 return false;
- }
+  if(vJetIdxs.empty()){
+    return false;
+  }
   
   // Check jet multiplicity
   if( debug) std::cout << " Matched jets " << jetIDs_.size() << std::endl;
@@ -175,13 +201,24 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
   edm::Handle<pat::JetCollection> jets;
   iEvent.getByToken(jetCollectionT_, jets);
 
+  v_att_tau_jet_m0_.clear();
+  v_att_tau_jet_pt_.clear();
+  v_att_tau_jet_eta_.clear();
+  v_att_tau_jet_phi_.clear();
+
   //h_tau_jet_nJet->Fill( vJetIdxs.size() );
 
   for ( size_t i=0; i < vJetIdxs.size(); ++i ) {
-int jetIndex = jetIDs_[i];
-std::cout << "HBHE passed jetIndex:" << jetIndex << std::endl;
-
-    // Fill histograms 
+    int jetIndex = vJetIdxs[i];
+    if(debug)std::cout << "HBHE passed jetIndex:" << jetIndex << std::endl;
+    pat::Jet iJet = (*jets)[jetIndex];
+    if(debug)std::cout << "-------------------------->Jet pt after HBHE cut " << iJet.pt() << "  eta:" << iJet.eta() << " phi:"<< iJet.phi() << " mass:" << iJet.mass()<< std::endl;
+    // Fill histograms
+    v_att_tau_jet_m0_.push_back(iJet.mass());
+    v_att_tau_jet_pt_.push_back(iJet.pt());
+    v_att_tau_jet_eta_.push_back(iJet.eta());
+    v_att_tau_jet_phi_.push_back(iJet.phi());
+ 
   
   }
 

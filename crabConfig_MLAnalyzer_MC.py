@@ -5,10 +5,12 @@ Process = '3p7'
 #Process = '10'
 
 inputDataset_ ={
-        '3p7': '/HToAATo4Tau_hadronic_tauDecay_M3p7_Run3_2023/lpcml-3p7_AODSIM_ignoreLocality-953b1873547799e513f8a43f2c57e3b2/USER',
+        '3p7': '/HToAATo4Tau_hadronic_tauDecay_M3p7_Run3_2023/lpcml-3p7_miniAODSIM-f2508c1b00fdd2cc2fdf87ba946bfa33/USER',#miniAOD
+        #'3p7': '/HToAATo4Tau_hadronic_tauDecay_M3p7_Run3_2023/lpcml-3p7_AODSIM_ignoreLocality-953b1873547799e513f8a43f2c57e3b2/USER',#AOD
         '4': '/HToAATo4Tau_hadronic_tauDecay_M4_Run3_2023/lpcml-4_AODSIM_ignoreLocality-953b1873547799e513f8a43f2c57e3b2/USER',
         '6': '/HToAATo4Tau_hadronic_tauDecay_M6_Run3_2023/lpcml-6_AODSIM_ignoreLocality-953b1873547799e513f8a43f2c57e3b2/USER',
-        '14':'/HToAATo4Tau_hadronic_tauDecay_M14_Run3_2023/phys_diffraction-14_AODSIM_multiThreads_8Gb_new-953b1873547799e513f8a43f2c57e3b2/USER',
+        '14':'/HToAATo4Tau_hadronic_tauDecay_M14_Run3_2023/lpcml-14_miniAODSIM-f2508c1b00fdd2cc2fdf87ba946bfa33/USER',#miniAOD
+        #'14':'/HToAATo4Tau_hadronic_tauDecay_M14_Run3_2023/phys_diffraction-14_AODSIM_multiThreads_8Gb_new-953b1873547799e513f8a43f2c57e3b2/USER',#AOD
         'QCD':'/GEN_SIM_QCD_pt15to7000_Run3Summer23GS/lpcml-AOD_QCD_pt15to7000_Run3Summer23GS-953b1873547799e513f8a43f2c57e3b2/USER',
         'WJets': "/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/lpcml-WJets_AODSIM_multiThreads-953b1873547799e513f8a43f2c57e3b2/USER",
         'DYTo2L':'/DYto2L_M-50_TuneCP5_13p6TeV_pythia8/lpcml-DYto2L_AODSIM_check-953b1873547799e513f8a43f2c57e3b2/USER',
@@ -19,13 +21,13 @@ inputDataset_ ={
 outputDataset_ = {
         #'3p7':'HToAATo4Tau_M_3p7_pythia8_2018UL_AOD'
         #'8':'HToAATo4Tau_M_8_pythia8_2018UL_AOD',
-        '12':'HToAATo4Tau_M_12_pythia8_2018UL_AOD',
-        #'WJets':'WJetsToLNu_TuneCP5_13TeV_madgraphMLM-pythia8',
+        #'12':'HToAATo4Tau_M_12_pythia8_2018UL_AOD',
+        'WJets':'WJetsToLNu_TuneCP5_13TeV_madgraphMLM-pythia8',
         #'TTbar':'TTToHadronic_TuneCP5_13TeV_powheg-pythia8'
         }.get(Process, None)
 
 #config.section_('General')
-config.General.requestName = '%s_MLAnalyzer_bigProduction'%Process
+config.General.requestName = '%s_MLAnalyzer_miniAOD_bigProductionRe'%Process
 config.General.workArea = 'crab_bigProduction'
 config.General.transferOutputs = True
 config.General.transferLogs = True
@@ -41,7 +43,7 @@ config.JobType.allowUndistributedCMSSW = True
 config.Data.inputDataset =inputDataset_
 #config.Data.userInputFiles = open('%s'%inputProcess_).readlines()
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 10 
+config.Data.unitsPerJob = 1 
 #config.Data.outputPrimaryDataset = outputDataset_ 
 
 config.Data.ignoreLocality = True

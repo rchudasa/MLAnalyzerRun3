@@ -394,7 +394,6 @@ int RecHitAnalyzer::getTruthLabel(const reco::PFJetRef& recJet, edm::Handle<reco
   return -99;
 }
 
-
 Measurement1D RecHitAnalyzer::vertexDxy(const reco::VertexCompositePtrCandidate &svcand, const reco::Vertex &pv)  {
   VertexDistanceXY dist;
   reco::Vertex::CovarianceMatrix csv; svcand.fillVertexCovariance(csv);
