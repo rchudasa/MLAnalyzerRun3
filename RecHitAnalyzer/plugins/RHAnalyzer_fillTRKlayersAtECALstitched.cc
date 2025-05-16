@@ -418,13 +418,6 @@ void RecHitAnalyzer::fillTRKlayersAtECALstitched ( const edm::Event& iEvent, con
   hit_layer.clear();
   hit_type.clear();
 
-  //edm::Handle<TrackingRecHitCollection> TRKRecHitsH_;
-  //iEvent.getByToken( TRKRecHitCollectionT_, TRKRecHitsH_ );
-  // Provides access to global cell position
-
-  // edm::ESHandle<CaloGeometry> caloGeomH_;
-  // iSetup.get<CaloGeometryRecord>().get( caloGeomH_ );
-  // const CaloGeometry* caloGeom = caloGeomH_.product();
   auto const& caloGeom = iSetup.getData(caloGeomToken_);
 
 

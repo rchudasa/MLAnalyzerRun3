@@ -22,7 +22,7 @@ vector<float> v_att_tau_jet_phi_;
 vector<float> v_att_tau_jetIsSignal_;
 vector<float> v_att_tau_jetdR_;
 
-
+std::map<int, std::vector<int>> jetToGenMap_;  // jet index -> matched gen particle indices
 std::vector<int> jetIDs_;                          // jet index or unique ID
 std::vector<std::vector<int>> matchedGenIDs_;      // vector of matched gen IDs per jet
 
@@ -153,6 +153,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
       if (!matchedGenIDs.empty()) {
 	jetIDs_.push_back(iJ);  // Index of the jet in the collection
 	matchedGenIDs_.push_back(matchedGenIDs);  // All matched gen IDs for this jet
+	jetToGenMap_[iJ] = matchedGenIDs;
       }
     } // is MC selection
     
@@ -201,6 +202,9 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
   edm::Handle<pat::JetCollection> jets;
   iEvent.getByToken(jetCollectionT_, jets);
 
+  edm::Handle<reco::GenParticleCollection> genParticles;
+  iEvent.getByToken( genParticleCollectionT_, genParticles );
+
   v_att_tau_jet_m0_.clear();
   v_att_tau_jet_pt_.clear();
   v_att_tau_jet_eta_.clear();
@@ -212,13 +216,26 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
     int jetIndex = vJetIdxs[i];
     if(debug)std::cout << "HBHE passed jetIndex:" << jetIndex << std::endl;
     pat::Jet iJet = (*jets)[jetIndex];
-    if(debug)std::cout << "-------------------------->Jet pt after HBHE cut " << iJet.pt() << "  eta:" << iJet.eta() << " phi:"<< iJet.phi() << " mass:" << iJet.mass()<< std::endl;
+    std::cout << "-------------------------->Jet pt after HBHE cut " << iJet.pt() << "  eta:" << iJet.eta() << " phi:"<< iJet.phi() << " mass:" << iJet.mass()<< std::endl;
     // Fill histograms
     v_att_tau_jet_m0_.push_back(iJet.mass());
     v_att_tau_jet_pt_.push_back(iJet.pt());
     v_att_tau_jet_eta_.push_back(iJet.eta());
     v_att_tau_jet_phi_.push_back(iJet.phi());
- 
+
+     // Fill gen info only if jet is matched
+  auto matchIter = jetToGenMap_.find(jetIndex);
+  if (matchIter != jetToGenMap_.end()) {
+    for (int genIdx : matchIter->second) {
+      const auto& gen = (*genParticles)[genIdx];
+      std::cout << " gen ID:" << genIdx << " pt after HBHE cut:" << gen.pt() << " eta:" << gen.eta() << " phi:" << gen.phi() << " pdgId:" << gen.pdgId() << std::endl;
+      //v_att_genMatched_pt_.push_back(gen.pt());
+      //v_att_genMatched_eta_.push_back(gen.eta());
+      //v_att_genMatched_phi_.push_back(gen.phi());
+      //v_att_genMatched_pdgId_.push_back(gen.pdgId());
+    }
+  }
+
   
   }
 

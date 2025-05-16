@@ -171,13 +171,13 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   } else {
     branchesEvtSel( RHTree, fs );
   }
-  branchesEB           ( RHTree, fs );
-  branchesEE           ( RHTree, fs );
+  //branchesEB           ( RHTree, fs );
+  //branchesEE           ( RHTree, fs );
   branchesHBHE         ( RHTree, fs );
-  branchesECALatHCAL   ( RHTree, fs );
+  //branchesECALatHCAL   ( RHTree, fs );
   branchesECALstitched ( RHTree, fs );
-  branchesHCALatEBEE   ( RHTree, fs );
-  branchesTracksAtEBEE(RHTree, fs);
+  //branchesHCALatEBEE   ( RHTree, fs );
+  //branchesTracksAtEBEE(RHTree, fs);
   branchesTracksAtECALstitched( RHTree, fs);
   //branchesTRKlayersAtEBEE(RHTree, fs);
   //branchesTRKlayersAtECAL(RHTree, fs);
@@ -227,13 +227,13 @@ RecHitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     return;
   }
 
-  fillEB( iEvent, iSetup );
-  fillEE( iEvent, iSetup );
+  //fillEB( iEvent, iSetup );
+  //fillEE( iEvent, iSetup );
   fillHBHE( iEvent, iSetup );
-  fillECALatHCAL( iEvent, iSetup );
+  //fillECALatHCAL( iEvent, iSetup );
   fillECALstitched( iEvent, iSetup );
-  fillHCALatEBEE( iEvent, iSetup );
-  fillTracksAtEBEE( iEvent, iSetup );
+  //fillHCALatEBEE( iEvent, iSetup );
+  //fillTracksAtEBEE( iEvent, iSetup );
   for (unsigned int i=0;i<Nproj;i++)
   {
     fillTracksAtECALstitched( iEvent, iSetup, i );
