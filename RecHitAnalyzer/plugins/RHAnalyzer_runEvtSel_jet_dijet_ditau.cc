@@ -12,6 +12,10 @@ TH1F *hNpassed_hbheCrop;
 vector<float> v_att_genHiggs_M_;
 vector<float> v_att_genPS_M_;
 vector<float> v_att_genTau_pT_;
+vector<float> v_att_genTau_eta_;
+vector<float> v_att_genTau_phi_;
+vector<float> v_att_genTau_prongs_;
+vector<float> v_att_genTau1Tau2_dR_;
 
 //jet variables
 int v_att_tau_njet_;
@@ -33,6 +37,12 @@ void RecHitAnalyzer::branchesEvtSel_jet_dijet_ditau ( TTree* tree, edm::Service<
   hNpassed_minTwoJets  = fs->make<TH1F>("hNpassed_minTwoJets","Atleast two jets in the event (0: No, 1: Yes)", 2, 0, 2);
   hNpassed_leptonVeto  = fs->make<TH1F>("hNpassed_leptonVeto","Veto lepton jets in the event (0: No, 1: Yes)", 2, 0, 2);
   hNpassed_hbheCrop   = fs->make<TH1F>("hNpassed_hbheCrop","Jets in the events passing HB-HE edge cut (0: No, 1: Yes)", 2, 0, 2);
+
+  //gen variables
+  tree->Branch("genTauPt",            &v_att_genTau_pT_);
+  tree->Branch("genTauEta",           &v_att_genTau_eta_);
+  tree->Branch("genTauPhi",           &v_att_genTau_phi_);
+  tree->Branch("genTau1Tau2dR",       &v_att_genTau1Tau2_dR_);
 
   //jet variables
   tree->Branch("nJets",            &v_att_tau_njet_);
@@ -109,14 +119,13 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 	
 	float dR = reco::deltaR( iJet.eta(),iJet.phi(), iGen->eta(),iGen->phi() );
         if ( dR > 0.4 ) continue;
-	
+		
         if ( iGen->pt() > 20 && (std::abs(iGen->pdgId()) == 11 || std::abs(iGen->pdgId()) == 13) ) break; //only clean jets (lepton veto) 
         if ( std::abs(iGen->pdgId()) == 12 || std::abs(iGen->pdgId()) == 14 || std::abs(iGen->pdgId()) == 16 ) continue;
 	
         if (  isSignal_ && !( std::abs(iGen->pdgId()) == 15 && iGen->status() == 2 ) ) continue;  //only for tau signal
         if ( !isSignal_ && !isW_ && !( iGen->status() == 23 ) ) continue;                         //for QCD background
         if ( !isSignal_ &&  isW_ && !( iGen->status() == 71 ) ) continue;                         //only for W + jet background
-	
         if ( debug ) std::cout << "   GEN particle " << iGenParticle << " index [" << iG << "] -> status: " << iGen->status() << ", id: " << iGen->pdgId() << ", nDaught: " << iGen->numberOfDaughters() << " nMoms: " <<iGen->numberOfMothers() << " | pt: "<< iGen->pt() << " eta: " <<iGen->eta() << " phi: " <<iGen->phi() << " | dR: " << dR << std::endl;
 	
         if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << std::endl;
@@ -174,23 +183,23 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
     return false;
   }
   hNpassed_minTwoJets->Fill(1);
-
+  
   for (size_t i = 0; i < jetIDs_.size(); ++i) {
-    if(debug)std::cout << "********************Jet ID: " << jetIDs_[i] << " matched to GenParticles IDs: ";
+    if( debug ) std::cout << "********************Jet ID: " << jetIDs_[i] << " matched to GenParticles IDs: ";
     vJetIdxs.push_back(jetIDs_[i]);
     for (size_t j = 0; j < matchedGenIDs_[i].size(); ++j) {
-      if(debug)std::cout << matchedGenIDs_[i][j];
-      if (j != matchedGenIDs_[i].size() - 1) { if(debug)std::cout << ", ";}
+      if( debug ) std::cout << matchedGenIDs_[i][j];
+      if (j != matchedGenIDs_[i].size() - 1) { if( debug ) std::cout << ", ";}
     }
     if(debug)std::cout << std::endl;
   }
-
+  
   if(vJetIdxs.empty()){
     return false;
   }
   
   // Check jet multiplicity
-  if( debug) std::cout << " Matched jets " << jetIDs_.size() << std::endl;
+  if ( debug ) std::cout << " Matched jets " << jetIDs_.size() << std::endl;
   if ( debug ) std::cout << " >> Event contains a tau candidate" << std::endl;
   return true;
   
@@ -205,6 +214,11 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
   edm::Handle<reco::GenParticleCollection> genParticles;
   iEvent.getByToken( genParticleCollectionT_, genParticles );
 
+  v_att_tau_njet_ = vJetIdxs.size();
+  v_att_genTau_pT_.clear();
+  v_att_genTau_eta_.clear();
+  v_att_genTau_phi_.clear();
+  v_att_genTau1Tau2_dR_.clear();
   v_att_tau_jet_m0_.clear();
   v_att_tau_jet_pt_.clear();
   v_att_tau_jet_eta_.clear();
@@ -212,31 +226,82 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
 
   //h_tau_jet_nJet->Fill( vJetIdxs.size() );
 
+  for (size_t i = 0; i < genParticles->size(); ++i) {
+    const reco::GenParticle& gen = genParticles->at(i);
+    
+    if (std::abs(gen.pdgId()) != 25) continue; 
+    
+    std::vector<const reco::GenParticle*> tauDaughters;
+    
+    for (unsigned int d = 0; d < gen.numberOfDaughters(); ++d) {
+      const reco::GenParticle* dau = dynamic_cast<const reco::GenParticle*>(gen.daughter(d));
+      if (!dau) continue;
+      if (std::abs(dau->pdgId()) == 15 && dau->status()==2 ) {
+	tauDaughters.push_back(dau);
+      }
+      else if(std::abs(dau->pdgId()) == 15 &&  dau->status()==23){
+	// Now look at daughter's daughters
+	int nGrandDau = dau->numberOfDaughters();
+	for (int j = 0; j < nGrandDau; ++j) {
+	  const reco::GenParticle* grandDau = dynamic_cast<const reco::GenParticle*>(dau->daughter(j));
+	  if (std::abs(grandDau->pdgId())!=15) continue;
+	  if( debug )std::cout<<"grand dau pdgID "<<grandDau->pdgId() << " status:" << grandDau->status() << std::endl;
+	  tauDaughters.push_back(grandDau);	
+	}
+      }
+    } //no. of daughters
+    if ( debug )std::cout<< "Size of gen tau daughters" << tauDaughters.size() << std::endl; 
+    if (tauDaughters.size() != 2) continue;
+    
+    const reco::GenParticle* tau1 = tauDaughters[0];
+    const reco::GenParticle* tau2 = tauDaughters[1];
+    
+    bool tau1Matched = false, tau2Matched = false;
+    
+    for (const auto& pair : jetToGenMap_) {
+      const int jetIdx = pair.first;
+      const std::vector<int>& matchedGenIdxs = pair.second;
+      
+      for (int genIdx : matchedGenIdxs) {
+	if(debug) std::cout<< "**************************** genIdx:" << genIdx << std::endl;
+	const reco::GenParticle& matchedGen = genParticles->at(genIdx);
+	if (&matchedGen == tau1){ tau1Matched = true; if( debug )std::cout <<  " matched genID:" << genIdx << " tau 1 Macthed "<<  std::endl;}
+	if (&matchedGen == tau2){ tau2Matched = true; if( debug )std::cout <<  " matched genID:" << genIdx << " tau 2 Macthed "<<  std::endl;}
+      }
+    }
+    
+    if (tau1Matched || tau2Matched) {
+      float dR = reco::deltaR(tau1->eta(), tau1->phi(), tau2->eta(), tau2->phi());
+      if(debug) std::cout << " coming in dR loop---------------------------------------------------" << std::endl;
+      v_att_genTau_pT_.push_back(tau1->pt());
+      v_att_genTau_pT_.push_back(tau2->pt());
+      v_att_genTau_eta_.push_back(tau1->eta());
+      v_att_genTau_eta_.push_back(tau2->eta());
+      v_att_genTau_phi_.push_back(tau1->phi());
+      v_att_genTau_phi_.push_back(tau2->phi());
+      v_att_genTau1Tau2_dR_.push_back(dR);
+
+      if( debug )std::cout << "[dR from gen pseudoscalar daughters] dR = " << dR << " tau1 pt :" << tau1->pt() << " eta:"<< tau1->eta() << " status:" << tau1->status();
+      if ( debug ) std::cout << " tau2 pt:"<< tau2->pt() << " eta:"<< tau2->eta() << " status:" << tau2->status() << std::endl;
+    }
+    else {std::cout << "none of the gen tau matched to gen-jet value map gen particle" << std::endl;}
+  }
+  
+  
+  // jet loop ///////
+  ///////////////////
   for ( size_t i=0; i < vJetIdxs.size(); ++i ) {
-    int jetIndex = vJetIdxs[i];
-    if(debug)std::cout << "HBHE passed jetIndex:" << jetIndex << std::endl;
-    pat::Jet iJet = (*jets)[jetIndex];
-    std::cout << "-------------------------->Jet pt after HBHE cut " << iJet.pt() << "  eta:" << iJet.eta() << " phi:"<< iJet.phi() << " mass:" << iJet.mass()<< std::endl;
+    int jetIdx_i = vJetIdxs[i];
+    if(debug)std::cout << "HBHE passed jetIdx_i:" << jetIdx_i << std::endl;
+    pat::Jet iJet = (*jets)[jetIdx_i];
+    if(debug)std::cout << "-------------------------->Jet pt after HBHE cut " << iJet.pt() << "  eta:" << iJet.eta() << " phi:"<< iJet.phi() << " mass:" << iJet.mass()<< std::endl;
     // Fill histograms
     v_att_tau_jet_m0_.push_back(iJet.mass());
     v_att_tau_jet_pt_.push_back(iJet.pt());
     v_att_tau_jet_eta_.push_back(iJet.eta());
     v_att_tau_jet_phi_.push_back(iJet.phi());
+    
 
-     // Fill gen info only if jet is matched
-  auto matchIter = jetToGenMap_.find(jetIndex);
-  if (matchIter != jetToGenMap_.end()) {
-    for (int genIdx : matchIter->second) {
-      const auto& gen = (*genParticles)[genIdx];
-      std::cout << " gen ID:" << genIdx << " pt after HBHE cut:" << gen.pt() << " eta:" << gen.eta() << " phi:" << gen.phi() << " pdgId:" << gen.pdgId() << std::endl;
-      //v_att_genMatched_pt_.push_back(gen.pt());
-      //v_att_genMatched_eta_.push_back(gen.eta());
-      //v_att_genMatched_phi_.push_back(gen.phi());
-      //v_att_genMatched_pdgId_.push_back(gen.pdgId());
-    }
-  }
-
+  } // jetID loop
   
-  }
-
 } // fillEvtSel_jet_dijet_tau()

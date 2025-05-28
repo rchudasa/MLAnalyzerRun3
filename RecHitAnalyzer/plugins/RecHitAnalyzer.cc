@@ -31,13 +31,17 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   isW_       = iConfig.getParameter<bool>("isW");
   isBoostedTop_   = iConfig.getParameter<bool>("isBoostedTop");
 
-  //EBRecHitCollectionT_    = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EBRecHitCollection"));
-  EBRecHitCollectionT_    = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEBRecHitCollection"));
-  //EBDigiCollectionT_      = consumes<EBDigiCollection>(iConfig.getParameter<edm::InputTag>("selectedEBDigiCollection"));
-  //EBDigiCollectionT_      = consumes<EBDigiCollection>(iConfig.getParameter<edm::InputTag>("EBDigiCollection"));
-  EERecHitCollectionT_    = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEERecHitCollection"));
-  //EERecHitCollectionT_    = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EERecHitCollection"));
-  HBHERecHitCollectionT_  = consumes<HBHERecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedHBHERecHitCollection"));
+  EBRecHitCollectionT_        = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EBRecHitCollection"));
+  EBRecHitAODCollectionT_     = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEBRecHitAODCollection"));
+  EBRecHitminiAODCollectionT_ = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEBRecHitminiAODCollection"));
+  
+  EERecHitCollectionT_        = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("EERecHitCollection"));
+  EERecHitAODCollectionT_     = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEERecHitAODCollection"));
+  EERecHitminiAODCollectionT_ = consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEERecHitminiAODCollection"));
+  
+  HBHERecHitCollectionT_         = consumes<HBHERecHitCollection>(iConfig.getParameter<edm::InputTag>("HBHERecHitCollection"));
+  HBHERecHitAODCollectionT_      = consumes<HBHERecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedHBHERecHitAODCollection"));
+  HBHERecHitminiAODCollectionT_  = consumes<HBHERecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedHBHERecHitminiAODCollection"));
   TRKRecHitCollectionT_   = consumes<TrackingRecHitCollection>(iConfig.getParameter<edm::InputTag>("trackRecHitCollection"));
 
   if(isMC_){
@@ -174,8 +178,12 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   //branchesEB           ( RHTree, fs );
   //branchesEE           ( RHTree, fs );
   branchesHBHE         ( RHTree, fs );
+  branchesHBHEAOD      ( RHTree, fs );
+  branchesHBHEminiAOD  ( RHTree, fs );
   //branchesECALatHCAL   ( RHTree, fs );
   branchesECALstitched ( RHTree, fs );
+  branchesECALstitchedAOD ( RHTree, fs );
+  branchesECALstitchedminiAOD ( RHTree, fs );
   //branchesHCALatEBEE   ( RHTree, fs );
   //branchesTracksAtEBEE(RHTree, fs);
   branchesTracksAtECALstitched( RHTree, fs);
@@ -230,8 +238,12 @@ RecHitAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
   //fillEB( iEvent, iSetup );
   //fillEE( iEvent, iSetup );
   fillHBHE( iEvent, iSetup );
+  fillHBHEAOD( iEvent, iSetup );
+  fillHBHEminiAOD( iEvent, iSetup );
   //fillECALatHCAL( iEvent, iSetup );
   fillECALstitched( iEvent, iSetup );
+  fillECALstitchedAOD( iEvent, iSetup );
+  fillECALstitchedminiAOD( iEvent, iSetup );
   //fillHCALatEBEE( iEvent, iSetup );
   //fillTracksAtEBEE( iEvent, iSetup );
   for (unsigned int i=0;i<Nproj;i++)

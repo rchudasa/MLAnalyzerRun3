@@ -160,7 +160,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
 
   edm::Handle<pat::JetCollection> jets;
   iEvent.getByToken(jetCollectionT_, jets);
-  if ( debug ) std::cout << " >> PATJetCol.size: " << jets->size() << std::endl;
+  //if ( debug ) std::cout << " >> PATJetCol.size: " << jets->size() << std::endl;
 
   float seedE;
   int iphi_, ieta_, ietaAbs_;
@@ -176,21 +176,21 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
 
     pat::Jet iJet = (*jets)[thisJetIdx];
     
-    if ( debug ) std::cout << " >> jet[" << thisJetIdx << "]Pt:" << iJet.pt()  << " Eta:" << iJet.eta()  << " Phi:" << iJet.phi()
-			   << " jetE:" << iJet.energy() << " jetM:" << iJet.mass() << std::endl;
+    //if ( debug ) std::cout << " >> jet[" << thisJetIdx << "]Pt:" << iJet.pt()  << " Eta:" << iJet.eta()  << " Phi:" << iJet.phi()
+		//	   << " jetE:" << iJet.energy() << " jetM:" << iJet.mass() << std::endl;
 
     // Get closest HBHE tower to jet position
     // This will not always be the most energetic deposit
     HcalDetId hId( spr::findDetIdHCAL(&caloGeom, iJet.eta(), iJet.phi(), false ) );
     if ( hId.subdet() != HcalBarrel && hId.subdet() != HcalEndcap ){
       vFailedJetIdx_.push_back(thisJetIdx);
-      if(debug)std::cout << "Fail getting HBHE tower to jet position" << std::endl;
+      //if(debug)std::cout << "Fail getting HBHE tower to jet position" << std::endl;
       continue;
     }
     HBHERecHitCollection::const_iterator iRHit( HBHERecHitsH_->find(hId) );
     seedE = ( iRHit == HBHERecHitsH_->end() ) ? 0. : iRHit->energy() ;
     HcalDetId seedId = hId;
-    if ( debug ) std::cout << " >> hId.ieta:" << hId.ieta() << " hId.iphi:" << hId.iphi() << " E:" << seedE << std::endl;
+    //if ( debug ) std::cout << " >> hId.ieta:" << hId.ieta() << " hId.iphi:" << hId.iphi() << " E:" << seedE << std::endl;
 
     // Look for the most energetic HBHE tower deposit within a search window
     for ( int ieta = 0; ieta < search_window; ieta++ ) {
@@ -218,7 +218,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
         HBHERecHitCollection::const_iterator iRHit( HBHERecHitsH_->find(hId_) );
         if ( iRHit == HBHERecHitsH_->end() ) continue;
         if ( iRHit->energy() <= seedE ) continue;
-        if ( debug ) std::cout << " !! hId.ieta:" << hId_.ieta() << " hId.iphi:" << hId_.iphi() << " E:" << iRHit->energy() << std::endl;
+        //if ( debug ) std::cout << " !! hId.ieta:" << hId_.ieta() << " hId.iphi:" << hId_.iphi() << " E:" << iRHit->energy() << std::endl;
 
         seedE = iRHit->energy();
         seedId = hId_;
@@ -238,14 +238,14 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
     // If the seed is too close to the edge of HE, discard event
     // Required to keep the seed at the image center
     if ( HBHE_IETA_MAX_HE-1 - ietaAbs_ < image_padding ) {
-      if ( debug ) std::cout << " Fail HE edge cut " << std::endl;
+      //if ( debug ) std::cout << " Fail HE edge cut " << std::endl;
       vFailedJetIdx_.push_back(thisJetIdx);
       continue;
     }
 
     // Save position of most energetic HBHE tower
     // in EB-aligned coordinates
-    if ( debug ) std::cout << " !! ieta_:" << ieta_ << " iphi_:" << iphi_ << " ietaAbs_:" << ietaAbs_ << " E:" << seedE << std::endl;
+    //if ( debug ) std::cout << " !! ieta_:" << ieta_ << " iphi_:" << iphi_ << " ietaAbs_:" << ietaAbs_ << " E:" << seedE << std::endl;
     vJetSeed_iphi_.push_back( iphi_ );
     vJetSeed_ieta_.push_back( ieta_ );
     nJet++;

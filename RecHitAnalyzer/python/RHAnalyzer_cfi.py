@@ -18,16 +18,17 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
     , isBoostedTop                   = cms.bool(False)
 
     #, tracks = cms.untracked.InputTag('ctfWithMaterialTracks')
-    #, EBRecHitCollection             = cms.InputTag('ecalRecHit:EcalRecHitsEB')
-    , reducedEBRecHitCollection      = cms.InputTag('ecalRecHit:EcalRecHitsEB')
-    #, reducedEBRecHitCollection      = cms.InputTag('reducedEcalRecHitsEB')
-    #, EERecHitCollection             = cms.InputTag('ecalRecHit:EcalRecHitsEE')
-    , reducedEERecHitCollection      = cms.InputTag('ecalRecHit:EcalRecHitsEE')
-    #, reducedEERecHitCollection      = cms.InputTag('reducedEcalRecHitsEE')
-    #, EBDigiCollection               = cms.InputTag('simEcalDigis:ebDigis')
-    #, selectedEBDigiCollection       = cms.InputTag('selectDigi:selectedEcalEBDigiCollection')
-    , reducedHBHERecHitCollection    = cms.InputTag('hbhereco')
-    #, reducedHBHERecHitCollection    = cms.InputTag('reducedHcalRecHits:hbhereco')
+    , EBRecHitCollection             = cms.InputTag('ecalRecHit:EcalRecHitsEB') #RAW
+    , reducedEBRecHitAODCollection   = cms.InputTag('reducedEcalRecHitsEB') #AOD
+    , reducedEBRecHitminiAODCollection = cms.InputTag('reducedEgamma:reducedEBRecHits')#miniAOD
+    , EERecHitCollection             = cms.InputTag('ecalRecHit:EcalRecHitsEE')#RAW
+    , reducedEERecHitAODCollection   = cms.InputTag('reducedEcalRecHitsEE')#AOD
+    , reducedEERecHitminiAODCollection = cms.InputTag('reducedEgamma:reducedEERecHits')#miniAOD
+    
+    , HBHERecHitCollection    = cms.InputTag('hbhereco')#RAW
+    , reducedHBHERecHitAODCollection    = cms.InputTag('reducedHcalRecHits:hbhereco')#AOD
+    , reducedHBHERecHitminiAODCollection= cms.InputTag('reducedEgamma:reducedHBHEHits')#miniAOD reduced Egamma HCAL rechits
+    #, reducedHBHERecHitminiAODCollection= cms.InputTag('slimmedHcalRecHits:reducedHcalRecHits')#miniAOD
     , genParticleCollection          = cms.InputTag('prunedGenParticles')
     , ak4PFJetCollection             = cms.InputTag('slimmedJetsPuppi')
     , genJetCollection               = cms.InputTag('slimmedGenJets')
@@ -61,7 +62,7 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
 
     # Jet level cfg
     , nJets     = cms.int32(-1)
-    , minJetPt  = cms.double(10.)
+    , minJetPt  = cms.double(20.)
     , maxJetEta = cms.double(3.0)
     , z0PVCut   = cms.double(0.1)
 

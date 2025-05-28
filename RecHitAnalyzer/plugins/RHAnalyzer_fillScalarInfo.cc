@@ -66,10 +66,9 @@ void RecHitAnalyzer::fillScalarInfo ( const edm::Event& iEvent, const edm::Event
 
     if( debug) std::cout << "Met sumet " << met.sumEt() << std::endl;
     if( debug) std::cout << "Met pt " << met.pt() << std::endl;
-
+    if(debug) std::cout << std::endl << std::endl;
     unsigned int goodVertices = 0;
 
-    if ( debug ) std::cout << " >>>>>>>>>>>>>>>>>>>> evt:" << std::endl;
 
     if (vertices.isValid()){
       if (vertices->size() > 0){
