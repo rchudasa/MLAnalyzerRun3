@@ -92,12 +92,13 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   std::string trgName8 = "HLT_AK8DiPFJet2*0_2*0_MassSD*0";
   std::string trgName9 = "HLT_PFHT*_PFMET*_PFMHT*_IDTight";
   //std::string trgName10 = "DST_Run3_JetHT_PFScoutingPixelTracking*";
-  std::string trgName10 = "DST_Run3_*";
+  //std::string trgName10 = "DST_Run3_*";
 
   std::string trgPattern = "(" + trgName1 + "|" + trgName2 + "|" + trgName3 + "|" + trgName4 + "|" +
-  trgName5 + "|" + trgName6 + "|" + trgName7 + "|" + trgName8 + "|" + trgName9 + "|" + trgName10 +")";
-  //std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), trgPattern);
-  std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), trgName10);
+  trgName5 + "|" + trgName6 + "|" + trgName7 + "|" + trgName8 + "|" + trgName9 +")";
+  //trgName5 + "|" + trgName6 + "|" + trgName7 + "|" + trgName8 + "|" + trgName9 + "|" + trgName10 +")";
+  std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), trgPattern);
+  //std::vector<std::vector<std::string>::const_iterator> trgMatches = edm::regexMatch(triggerNames.triggerNames(), trgName10);
   
   if (debug) std::cout << "N matches: " << trgMatches.size() << std::endl;
  
@@ -113,7 +114,7 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
 
   hltAccept_doubleTau_ =0; hltAccept_pfmet_=0; hltAccept_ak8Jet_=0;hltAccept_pfht_=0; hltAccept_scouting_=0;
   bool triggerFired =false;
-  /*if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_DoubleMediumDeepTauPFTauHPS*")){triggerFired=true; hltAccept_doubleTau_ = 1;hNpassed_hlt->Fill(1);}
+  if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_DoubleMediumDeepTauPFTauHPS*")){triggerFired=true; hltAccept_doubleTau_ = 1;hNpassed_hlt->Fill(1);}
   if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_PFMET*")){triggerFired=true;hltAccept_pfmet_ = 1;hNpassed_hlt->Fill(2);}
  
 
@@ -123,8 +124,8 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   if(passTriggerPatternsAndGetName(hltresults,triggerNames, trgAK8Pattern)){triggerFired=true; hltAccept_ak8Jet_ =1; hNpassed_hlt->Fill(3);}
   
   if(passTriggerPatternsAndGetName(hltresults,triggerNames, "HLT_PFHT*_PFMET*_PFMHT*_IDTight")){triggerFired=true; hltAccept_pfht_ = 1;hNpassed_hlt->Fill(4);}
-  */
-  if(passTriggerPatternsAndGetName(hltresults,triggerNames, "DST_Run3_*")){triggerFired=true; hltAccept_scouting_ = 1;hNpassed_hlt->Fill(5);}
+  
+  //if(passTriggerPatternsAndGetName(hltresults,triggerNames, "DST_Run3_*")){triggerFired=true; hltAccept_scouting_ = 1;hNpassed_hlt->Fill(5);}
 
   // Ensure trigger acceptance
   if (!triggerFired){hNpassed_hlt->Fill(0); }

@@ -13,7 +13,7 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
     #, task                           = cms.string("boostedTop")
     , isDebug                        = cms.bool(True)
     , isMC                           = cms.bool(True)
-    , isSignal                       = cms.bool(True)
+    , isSignal                       = cms.bool(False)
     , isW                            = cms.bool(False)
     , isBoostedTop                   = cms.bool(False)
 
@@ -44,9 +44,9 @@ fevt = cms.EDAnalyzer('RecHitAnalyzer'
     #, srcPFCandidates                = cms.InputTag("particleFlow")
     #, srcPfJets                      = cms.InputTag("ak4PFJets")
     , metCollection                  = cms.InputTag("slimmedMETs")
-    #, eleCollection                  = cms.InputTag("gedGsfElectrons")
-    #, muonCollection                 = cms.InputTag("muons")
     , tauCollection                  = cms.InputTag("slimmedTaus")
+    , eleCollection                  = cms.InputTag("slimmedElectrons")
+    , muonCollection                 = cms.InputTag("slimmedMuons")
 
     , triggerResultsTag              = cms.InputTag("TriggerResults", "", "HLT")
     , triggerSummaryTag              = cms.InputTag("hltTriggerSummaryAOD","","HLT")

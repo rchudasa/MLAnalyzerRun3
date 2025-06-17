@@ -72,6 +72,8 @@ RecHitAnalyzer::RecHitAnalyzer(const edm::ParameterSet& iConfig)
   metCollectionT_           = consumes<pat::METCollection>(iConfig.getParameter<edm::InputTag>("metCollection"));
 
   tauCollectionT_           = consumes<pat::TauCollection>(iConfig.getParameter<edm::InputTag>("tauCollection"));
+  eleCollectionT_           = consumes<pat::ElectronCollection>(iConfig.getParameter<edm::InputTag>("eleCollection"));
+  muCollectionT_            = consumes<pat::MuonCollection>(iConfig.getParameter<edm::InputTag>("muonCollection"));
 
 
   processName_              = iConfig.getUntrackedParameter<std::string>("processName","HLT");

@@ -238,6 +238,8 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     //edm::EDGetTokenT<std::vector<reco::CandIPTagInfo> >    ipTagInfoCollectionT_;
     edm::EDGetTokenT<pat::METCollection> metCollectionT_;
     edm::EDGetTokenT<pat::TauCollection> tauCollectionT_;
+    edm::EDGetTokenT<pat::ElectronCollection> eleCollectionT_;
+    edm::EDGetTokenT<pat::MuonCollection> muCollectionT_;
 
     // edm::EDGetTokenT<reco::PFTauDiscriminator> boostedHPSPFTausTask_; // Boosted tau discriminator
 

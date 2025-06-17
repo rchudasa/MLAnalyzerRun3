@@ -5,7 +5,8 @@ using std::vector;
 const unsigned nJets = 50; //TODO: use cfg level nJets_
 TH1F *hNpassed_genJetMatch; 
 TH1F *hNpassed_minTwoJets; 
-TH1F *hNpassed_leptonVeto; 
+TH1F *hNpassed_eleVeto; 
+TH1F *hNpassed_muVeto; 
 TH1F *hNpassed_hbheCrop; 
 
 //gen variables
@@ -29,14 +30,23 @@ vector<float> v_att_tau_jetdR_;
 std::map<int, std::vector<int>> jetToGenMap_;  // jet index -> matched gen particle indices
 std::vector<int> jetIDs_;                          // jet index or unique ID
 std::vector<std::vector<int>> matchedGenIDs_;      // vector of matched gen IDs per jet
+std::vector<std::vector<int>> matchedEleIDs_;      // vector of matched ele IDs per jet
+std::vector<std::vector<int>> matchedMuIDs_;      // vector of matched muon IDs per jet
+
+std::map<int, std::vector<int>> jetToEleMap_; 
+std::map<int, std::vector<int>> jetToMuMap_;
+
+int jetMatchedEle;
+int jetMatchedMu;
 
 // Initialize branches _____________________________________________________//
 void RecHitAnalyzer::branchesEvtSel_jet_dijet_ditau ( TTree* tree, edm::Service<TFileService> &fs ) {
 
   hNpassed_genJetMatch = fs->make<TH1F>("hNpassed_genJetMatch","Jet matched to gen particle (0: No, 1: Yes)", 2, 0, 2);
+  hNpassed_eleVeto     = fs->make<TH1F>("hNpassed_eleVeto","Jets is not matched to electron in the event (0: No, 1: Yes)", 2, 0, 2);
+  hNpassed_muVeto      = fs->make<TH1F>("hNpassed_muVeto","Jet is not matched to muon in the event (0: No, 1: Yes)", 2, 0, 2);
+  hNpassed_hbheCrop    = fs->make<TH1F>("hNpassed_hbheCrop","Jets in the events passing HB-HE edge cut (0: No, 1: Yes)", 2, 0, 2);
   hNpassed_minTwoJets  = fs->make<TH1F>("hNpassed_minTwoJets","Atleast two jets in the event (0: No, 1: Yes)", 2, 0, 2);
-  hNpassed_leptonVeto  = fs->make<TH1F>("hNpassed_leptonVeto","Veto lepton jets in the event (0: No, 1: Yes)", 2, 0, 2);
-  hNpassed_hbheCrop   = fs->make<TH1F>("hNpassed_hbheCrop","Jets in the events passing HB-HE edge cut (0: No, 1: Yes)", 2, 0, 2);
 
   //gen variables
   tree->Branch("genTauPt",            &v_att_genTau_pT_);
@@ -64,16 +74,23 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
   edm::Handle<pat::JetCollection> jets;
   iEvent.getByToken(jetCollectionT_, jets);
 
-  edm::Handle<pat::TauCollection> taus;
-  iEvent.getByToken(tauCollectionT_, taus);
+  edm::Handle<pat::ElectronCollection> eles;
+  iEvent.getByToken(eleCollectionT_, eles);
 
   edm::Handle<reco::VertexCollection> vertices;
   iEvent.getByToken(vertexCollectionT_, vertices);
 
+  edm::Handle<pat::MuonCollection> mus;
+  iEvent.getByToken(muCollectionT_, mus);
 
   vJetIdxs.clear();
   jetIDs_.clear();
   matchedGenIDs_.clear();
+  matchedEleIDs_.clear();
+  matchedMuIDs_.clear();
+  jetToGenMap_.clear(); 
+  jetToEleMap_.clear();
+  jetToMuMap_.clear();
 
   unsigned int nMatchedJets = 0;
   unsigned int goodVertices = 0;
@@ -119,7 +136,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
 	
 	float dR = reco::deltaR( iJet.eta(),iJet.phi(), iGen->eta(),iGen->phi() );
         if ( dR > 0.4 ) continue;
-		
+	
         if ( iGen->pt() > 20 && (std::abs(iGen->pdgId()) == 11 || std::abs(iGen->pdgId()) == 13) ) break; //only clean jets (lepton veto) 
         if ( std::abs(iGen->pdgId()) == 12 || std::abs(iGen->pdgId()) == 14 || std::abs(iGen->pdgId()) == 16 ) continue;
 	
@@ -175,15 +192,73 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
     return false;
   }
   hNpassed_genJetMatch->Fill(1);
-  
+ 
+  jetMatchedEle = 0; 
   //apply lepton veto on jets here
+  for (size_t i = 0; i < jetIDs_.size(); ++i) {
+    int jetIdx_i = jetIDs_[i];
+    pat::Jet iJet = (*jets)[jetIdx_i];
+
+    //check the jet matching to electron
+    std::vector<int> matchedEleIDs;
+    for (size_t j = 0; j < eles->size(); ++j){
+      pat::Electron iEle = (*eles)[j];
+      
+      if ( std::abs(iEle.pt())  < 10.0 ) continue;
+      if ( std::abs(iEle.eta()) > 3.0 ) continue;
+      
+      float dR = reco::deltaR( iJet.eta(),iJet.phi(), iEle.eta(),iEle.phi() );
+      if ( dR > 0.4 ) continue;
+      bool eleID  = iEle.electronID("cutBasedElectronID-RunIIIWinter22-V1-veto");
+      if (eleID == false) continue;
+      std::cout << "------------------------------------------------------------------------------electron pt:" << iEle.pt() << std::endl;
+      jetMatchedEle ++;
+      
+      matchedEleIDs.push_back(j);
+    }//electron loop
+
+    //check the jet matching to muon
+    std::vector<int> matchedMuIDs;
+    for (size_t mm = 0; mm < mus->size(); ++mm){
+      pat::Muon iMu = (*mus)[mm];
+      
+      if ( std::abs(iMu.pt())  < 4.0 ) continue;
+      if ( std::abs(iMu.eta()) > 2.4 ) continue;
+      
+      float dR = reco::deltaR( iJet.eta(),iJet.phi(), iMu.eta(),iMu.phi() );
+      if ( dR > 0.4 ) continue;
+      bool muonID  = iMu.isMediumMuon();
+      if (muonID == false) continue;
+      std::cout << "-----------------------------------------------------------------------------------muon pt:" << iMu.pt() << std::endl;
+      jetMatchedMu ++;
+      
+      matchedMuIDs.push_back(mm);
+    }//muon loop
+    
+    if (!matchedEleIDs.empty()) {
+      matchedEleIDs_.push_back(matchedEleIDs);  // All matched gen IDs for this jet
+      jetToEleMap_[i] = matchedEleIDs;
+    }
+
+    if (!matchedMuIDs.empty()) {
+      matchedMuIDs_.push_back(matchedMuIDs);  // All matched gen IDs for this jet
+      jetToMuMap_[i] = matchedMuIDs;
+    }
+  }//jet loop
   
-  if(jetIDs_.size()<2){
-    hNpassed_minTwoJets->Fill(0);
+  if(!matchedEleIDs_.empty()){
+    hNpassed_eleVeto->Fill(0);
     return false;
   }
-  hNpassed_minTwoJets->Fill(1);
+  hNpassed_eleVeto->Fill(1);
   
+   if(!matchedMuIDs_.empty()){
+    hNpassed_muVeto->Fill(0);
+    return false;
+  }
+  hNpassed_muVeto->Fill(1);
+
+
   for (size_t i = 0; i < jetIDs_.size(); ++i) {
     if( debug ) std::cout << "********************Jet ID: " << jetIDs_[i] << " matched to GenParticles IDs: ";
     vJetIdxs.push_back(jetIDs_[i]);
@@ -225,7 +300,25 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
   v_att_tau_jet_phi_.clear();
 
   //h_tau_jet_nJet->Fill( vJetIdxs.size() );
+    /*for (const auto& pair : jetToGenMap_) {
+ 
+      const int jetIdx = pair.first;
+      if (std::find(vJetIdxs.begin(), vJetIdxs.end(), jetIdx) == vJetIdxs.end())continue; 
+      const std::vector<int>& matchedGenIdxs = pair.second;
+      for (int genIdx : matchedGenIdxs) {
+        if(debug) std::cout<< "**************************** jet matched to "<< jetIdx << "  genIdx:" << genIdx << std::endl;
+      }
+    }*/
 
+   if(vJetIdxs.size()<2){
+    hNpassed_minTwoJets->Fill(0);
+    return;
+  }
+  hNpassed_minTwoJets->Fill(1);
+
+
+  std::vector<std::vector<const reco::GenParticle*>> allTauDaughters;
+  
   for (size_t i = 0; i < genParticles->size(); ++i) {
     const reco::GenParticle& gen = genParticles->at(i);
     
@@ -244,14 +337,25 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
 	int nGrandDau = dau->numberOfDaughters();
 	for (int j = 0; j < nGrandDau; ++j) {
 	  const reco::GenParticle* grandDau = dynamic_cast<const reco::GenParticle*>(dau->daughter(j));
-	  if (std::abs(grandDau->pdgId())!=15) continue;
-	  if( debug )std::cout<<"grand dau pdgID "<<grandDau->pdgId() << " status:" << grandDau->status() << std::endl;
-	  tauDaughters.push_back(grandDau);	
+	  if (std::abs(grandDau->pdgId())==15){
+	    if( debug )std::cout<<"grand dau pdgID "<<grandDau->pdgId() << " status:" << grandDau->status() << std::endl;
+	    tauDaughters.push_back(grandDau);
+  	  }	  
 	}
       }
     } //no. of daughters
-    if ( debug )std::cout<< "Size of gen tau daughters" << tauDaughters.size() << std::endl; 
-    if (tauDaughters.size() != 2) continue;
+    if (!tauDaughters.empty()) {
+      allTauDaughters.push_back(tauDaughters);
+    }
+  }//genparticles loop
+
+  if( debug ) std::cout << "Found " << allTauDaughters.size() << " pseudoscalars with tau daughters" << std::endl;
+
+  for (size_t psIdx = 0; psIdx < allTauDaughters.size(); ++psIdx) {
+    std::cout << " - Pseudoscalar " << psIdx << " has " << allTauDaughters[psIdx].size() << " tau daughters" << std::endl;
+    
+    const std::vector<const reco::GenParticle*>& tauDaughters = allTauDaughters[psIdx];   
+    if (tauDaughters.size() != 2)continue;
     
     const reco::GenParticle* tau1 = tauDaughters[0];
     const reco::GenParticle* tau2 = tauDaughters[1];
@@ -260,6 +364,8 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
     
     for (const auto& pair : jetToGenMap_) {
       const int jetIdx = pair.first;
+      if (std::find(vJetIdxs.begin(), vJetIdxs.end(), jetIdx) == vJetIdxs.end())continue;
+
       const std::vector<int>& matchedGenIdxs = pair.second;
       
       for (int genIdx : matchedGenIdxs) {
@@ -280,14 +386,14 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
       v_att_genTau_phi_.push_back(tau1->phi());
       v_att_genTau_phi_.push_back(tau2->phi());
       v_att_genTau1Tau2_dR_.push_back(dR);
-
+      
       if( debug )std::cout << "[dR from gen pseudoscalar daughters] dR = " << dR << " tau1 pt :" << tau1->pt() << " eta:"<< tau1->eta() << " status:" << tau1->status();
       if ( debug ) std::cout << " tau2 pt:"<< tau2->pt() << " eta:"<< tau2->eta() << " status:" << tau2->status() << std::endl;
     }
     else {std::cout << "none of the gen tau matched to gen-jet value map gen particle" << std::endl;}
-  }
-  
-  
+    
+  } //2 PS loop
+
   // jet loop ///////
   ///////////////////
   for ( size_t i=0; i < vJetIdxs.size(); ++i ) {
