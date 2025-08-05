@@ -128,8 +128,8 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   //if(passTriggerPatternsAndGetName(hltresults,triggerNames, "DST_Run3_*")){triggerFired=true; hltAccept_scouting_ = 1;hNpassed_hlt->Fill(5);}
 
   // Ensure trigger acceptance
-  if (!triggerFired){hNpassed_hlt->Fill(0); }
-  //if (!triggerFired){hNpassed_hlt->Fill(0); return false;}
+  //if (!triggerFired){hNpassed_hlt->Fill(0); }
+  if (!triggerFired){hNpassed_hlt->Fill(0); return false;}
  
   
   // Run explicit jet selection

@@ -166,17 +166,17 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
           }
           if ( debug ) std::cout << "    Tau prongs = " << tauDaughters << " + Tau pi0 = " << taupi0 << std::endl;
 	  
-          if (!isSignal_){
-            //passedGenSel = false;  //only for background
-            break;                 //only for background
-          }	  
-        } 
+        }
+	if(iGen->status()==23 || (isW_ && iGen->status()==71)){
+	matchedGenIDs.push_back(iG);
+	}	
 	//passedGenSel = true;
         ++iGenParticle;
 	
       } // primary gen particles
       
       if (!matchedGenIDs.empty()) {
+	     std::cout << " Matched gen ID not empty" << std::endl;
 	jetIDs_.push_back(iJ);  // Index of the jet in the collection
 	matchedGenIDs_.push_back(matchedGenIDs);  // All matched gen IDs for this jet
 	jetToGenMap_[iJ] = matchedGenIDs;
