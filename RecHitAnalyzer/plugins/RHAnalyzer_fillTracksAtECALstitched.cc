@@ -358,7 +358,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         }
       }
       if (!pv_match)continue;
-    }
+    } //projection==4
 
 
     bool isPropagationOk=false;
@@ -371,7 +371,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         eta = iTk->eta();
         phi = iTk->phi();
         isPropagationOk=true;
-      }
+      } //case 1
       break;
 
       case 2: case 0: case 4: case 5:
@@ -384,7 +384,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           eta = propagatedECALTrack.direction.eta();
           phi = propagatedECALTrack.direction.phi();
         }
-      }
+      } //case 2, 0, 4, 5
       break;
 
       case 3:
@@ -397,15 +397,15 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           eta = propagatedHCALTrack.direction.eta();
           phi = propagatedHCALTrack.direction.phi();
         }
-      }
+      } //case 3
       break;
 
       default:
       {
         isPropagationOk=false;
-      }
+      } //default
       break;
-    }
+    } //switch
 
     if ( std::abs(eta) > 3. || !isPropagationOk) continue;
     DetId id( spr::findDetIdECAL(&caloGeom, eta, phi, false ) );
@@ -421,7 +421,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           trackDz_ = iTk->dz();
           trackDzError_ = iTk->dzError();
           break;
-        }
+        } //case 1, 2, 3
         case 5:
         {
           reco::TransientTrack t_tk = transTrackB_.build(&*iTk);
@@ -432,7 +432,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           trackDz_ = traj.perigeeParameters().longitudinalImpactParameter();
           trackDzError_ = TMath::Sqrt(TMath::Power(traj.perigeeError().longitudinalImpactParameterError(),2) + TMath::Power(the_PV.zError(),2));
           break;
-        }
+        } //case 5
         case 0: case 4: default:
         {
           trackD0_ = -iTk->dxy(the_PV.position());
@@ -442,8 +442,8 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           //trackDzError_ = iTk->dzError(the_PV.position());
           trackDzError_ = TMath::Sqrt(TMath::Power(iTk->dzError(),2) + TMath::Power(the_PV.zError(),2));
           break;
-        }
-      }
+        } // case 0, 4, default
+      } // switch
       // Fill intermediate helper histogram by eta,phi
       hEvt_EE_tracks[iz_]->Fill( phi, eta );
       hEvt_EE_tracksPt[iz_]->Fill( phi, eta, iTk->pt() );
