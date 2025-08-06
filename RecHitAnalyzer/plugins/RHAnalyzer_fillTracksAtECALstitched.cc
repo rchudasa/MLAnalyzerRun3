@@ -492,7 +492,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         }
       }
       if (!pv_match)continue;
-    }
+    } //proj
 
 
     bool isPropagationOk=false;
@@ -505,7 +505,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         eta = iTk->eta();
         phi = iTk->phi();
         isPropagationOk=true;
-      }
+      }//case 1
       break;
 
       case 2: case 0: case 4:
@@ -518,7 +518,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           eta = propagatedECALTrack.direction.eta();
           phi = propagatedECALTrack.direction.phi();
         }
-      }
+      } //case 2, 0, 4
       break;
 
       case 3:
@@ -531,7 +531,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           eta = propagatedHCALTrack.direction.eta();
           phi = propagatedHCALTrack.direction.phi();
         }
-      }
+      } //case 3
       break;
 
       default:
@@ -539,7 +539,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         isPropagationOk=false;
       }
       break;
-    }
+    } //switch
 
     if ( std::abs(eta) > 3. || !isPropagationOk) continue;
 
@@ -554,7 +554,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         trackDz_ = iTk->dz();
         trackDzError_ = iTk->dzError();
         break;
-      }
+      } //case 1, 2, 3
       case 0: case 4: default:
       {
         trackD0_ = -iTk->dxy(the_PV.position());
@@ -564,8 +564,8 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
         //trackDzError_ = iTk->dzError();
         trackDzError_ = TMath::Sqrt(TMath::Power(iTk->dzError(),2) + TMath::Power(the_PV.zError(),2));
         break;
-      }
-    }
+      } //case 0, 4
+    } //switch
 
     DetId id( spr::findDetIdECAL(&caloGeom, eta, phi, false ) );
     if ( id.subdetId() == EcalEndcap ) continue;
@@ -602,7 +602,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
       hECAL_tracksDzSig[proj]->Fill( iphi_, ieta_signed, trackDz_/trackDzError_ );
     }
 
-  } // EB
+  } // Track collection loop, fill the EB
   // Map EE+(phi,eta) to upper part of ECAL(iphi,ieta)
   ieta_global_offset = ECAL_IETA_MAX_EXT + EB_IETA_MAX;
   ieta_signed_offset = EB_IETA_MAX;
