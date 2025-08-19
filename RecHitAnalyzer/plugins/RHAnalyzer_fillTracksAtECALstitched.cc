@@ -237,6 +237,8 @@ void fillTracksAtECAL_with_EEproj ( int side, int ieta_global_offset, int ieta_s
       iphi_ = iphi_ > EB_IPHI_MAX ? iphi_-EB_IPHI_MAX : iphi_; // wrap-around
       iphi_ = iphi_ - 1;
       idx_  = ieta_global_*EB_IPHI_MAX + iphi_;
+      
+      if(trackDzSig_!=0)std::cout << "side:" << side << " ieta: " << ieta_signed_ << " iphi: " << iphi_ << " dzSig: " << trackDzSig_ << " original ieta:" << ieta << " iphi:" << iphi <<  std::endl;
       // Fill vector for image
       vECAL_tracks_[proj][idx_] = track_;
       vECAL_tracksPt_[proj][idx_] = trackPt_;
