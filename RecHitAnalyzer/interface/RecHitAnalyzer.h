@@ -365,12 +365,15 @@ class RecHitAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
     void branchesEvtSel_jet_dijet      ( TTree*, edm::Service<TFileService>& );
     void branchesEvtSel_jet_dijet_ditau( TTree*, edm::Service<TFileService>& );
     void branchesEvtSel_jet_dijet_ditau_h2aa4Tau( TTree*, edm::Service<TFileService>& );
+    void branchesEvtSel_jet_dijet_tau_massregression( TTree*, edm::Service<TFileService>& );
     bool runEvtSel_jet_dijet      ( const edm::Event&, const edm::EventSetup& );
     bool runEvtSel_jet_dijet_ditau( const edm::Event&, const edm::EventSetup& );
     bool runEvtSel_jet_dijet_ditau_h2aa4Tau( const edm::Event&, const edm::EventSetup& );
+    bool runEvtSel_jet_dijet_tau_massregression( const edm::Event&, const edm::EventSetup& );
     void fillEvtSel_jet_dijet      ( const edm::Event&, const edm::EventSetup& );
     void fillEvtSel_jet_dijet_ditau( const edm::Event&, const edm::EventSetup& );
     void fillEvtSel_jet_dijet_ditau_h2aa4Tau( const edm::Event&, const edm::EventSetup& );
+    void fillEvtSel_jet_dijet_tau_massregression( const edm::Event&, const edm::EventSetup& );
 
     //functions for secondary vertices
     inline float catchInfs(const float& in, float replace_value=0){

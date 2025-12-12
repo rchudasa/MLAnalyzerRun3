@@ -55,7 +55,10 @@ void RecHitAnalyzer::branchesEvtSel_jet ( TTree* tree, edm::Service<TFileService
   if ( task_ == "dijet_ditau" ) {
     branchesEvtSel_jet_dijet_ditau( tree, fs );
     //if(isMC_)branchesEvtSel_jet_dijet_ditau_h2aa4Tau( tree, fs );
-  } 
+  } else if (task_ == "tau_massregression"){
+    branchesEvtSel_jet_dijet_tau_massregression( tree, fs );
+  }
+
   
 } // branchesEvtSel_jet()
 
@@ -128,8 +131,8 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   //if(passTriggerPatternsAndGetName(hltresults,triggerNames, "DST_Run3_*")){triggerFired=true; hltAccept_scouting_ = 1;hNpassed_hlt->Fill(5);}
 
   // Ensure trigger acceptance
-  //if (!triggerFired){hNpassed_hlt->Fill(0); }
-  if (!triggerFired){hNpassed_hlt->Fill(0); return false;}
+  if (!triggerFired){hNpassed_hlt->Fill(0); }
+  //if (!triggerFired){hNpassed_hlt->Fill(0); return false;}
  
   
   // Run explicit jet selection
@@ -137,7 +140,11 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   if ( task_ == "dijet_ditau" ) {
     hasPassed = runEvtSel_jet_dijet_ditau( iEvent, iSetup );
     if ( debug && hasPassed ) std::cout << "!!!!!!   JET SELECTION HAS PASSED! " << std::endl;
-  } 
+  } else if ( task_ == "tau_massregression" ) {
+    hasPassed = runEvtSel_jet_dijet_tau_massregression( iEvent, iSetup );
+    if ( debug && hasPassed ) std::cout << "!!!!!!   JET SELECTION HAS PASSED! " << std::endl;
+  }
+ 
   
   if ( !hasPassed ) return false;
   //if (task_ == "dijet_ditau" && isMC_) runEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
@@ -280,7 +287,10 @@ bool RecHitAnalyzer::runEvtSel_jet ( const edm::Event& iEvent, const edm::EventS
   if ( task_ == "dijet_ditau" ) {
     fillEvtSel_jet_dijet_ditau( iEvent, iSetup );
     //if(isMC_)fillEvtSel_jet_dijet_ditau_h2aa4Tau( iEvent, iSetup );
-  } 
+  }else if ( task_ == "tau_massregression" ) {
+    fillEvtSel_jet_dijet_tau_massregression( iEvent, iSetup );
+  }
+ 
 
   return true;
 

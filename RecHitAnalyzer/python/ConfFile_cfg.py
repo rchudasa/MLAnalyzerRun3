@@ -55,7 +55,7 @@ print (" >> Loaded",len(options.inputFiles),"input files from list.")
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
     # ,SkipEvent = cms.untracked.vstring('ProductNotFound')
-    ,numberOfThreads = cms.untracked.uint32(1)
+    #,numberOfThreads = cms.untracked.uint32(8)
 )
 
 process.load("MLAnalyzerRun3.RecHitAnalyzer.RHAnalyzer_cfi")

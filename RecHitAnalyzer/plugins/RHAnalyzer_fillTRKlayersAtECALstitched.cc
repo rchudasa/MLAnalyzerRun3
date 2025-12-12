@@ -268,6 +268,7 @@ void fillTRKLayerAtECAL_with_EEproj( TH2F *hEvt_EE_SUBDET, std::vector<float> & 
       // Fill vector for image
       vSUBDET_ECAL_[idx_] = nEntries_;
       // Fill histogram for monitoring
+      //std::cout << "Pushing back ieta:" << ieta_signed_ << " iphi:" << iphi_ << " no hits:" << nEntries_ << std::endl;
       hSUBDET_ECAL->Fill( iphi_, ieta_signed_, nEntries_ );
     } // iphi_
   } // ieta_
@@ -277,7 +278,7 @@ void fillTRKLayerAtECAL_with_EEproj( TH2F *hEvt_EE_SUBDET, std::vector<float> & 
 void fillTRKLayerAtECAL_with_EEproj( TH2F *hEvt_EE_SUBDET[][nEE], std::vector<float> vSUBDET_ECAL_[][Nhitproj], TH2F *hSUBDET_ECAL[][Nhitproj], int nSUBDET, unsigned int proj ){
   int ieta_global_offset,ieta_signed_offset;
   for(int nLayer=0; nLayer<nSUBDET; nLayer++){
-
+     if (nLayer>0) continue;
     // Map EE-(phi,eta) to bottom part of ECAL(iphi,ieta)
     ieta_global_offset = 0;
     ieta_signed_offset = -ECAL_IETA_MAX_EXT;
@@ -774,10 +775,10 @@ void RecHitAnalyzer::fillTRKlayersAtECALstitched ( const edm::Event& iEvent, con
   } // end loop over detectors
 
   fillTRKLayerAtECAL_with_EEproj( hEvt_EE_BPIX, vBPIX_ECAL_, hBPIX_ECAL, nBPIX, proj);
-  fillTRKLayerAtECAL_with_EEproj( hEvt_EE_FPIX, vFPIX_ECAL_, hFPIX_ECAL, nFPIX, proj);
-  fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TOB, vTOB_ECAL_, hTOB_ECAL, nTOB, proj);
-  fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TIB, vTIB_ECAL_, hTIB_ECAL, nTIB, proj);
-  fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TEC, vTEC_ECAL_, hTEC_ECAL, nTEC, proj);
-  fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TID, vTID_ECAL_, hTID_ECAL, nTID, proj);
+  //fillTRKLayerAtECAL_with_EEproj( hEvt_EE_FPIX, vFPIX_ECAL_, hFPIX_ECAL, nFPIX, proj);
+  //fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TOB, vTOB_ECAL_, hTOB_ECAL, nTOB, proj);
+  //fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TIB, vTIB_ECAL_, hTIB_ECAL, nTIB, proj);
+  //fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TEC, vTEC_ECAL_, hTEC_ECAL, nTEC, proj);
+  //fillTRKLayerAtECAL_with_EEproj( hEvt_EE_TID, vTID_ECAL_, hTID_ECAL, nTID, proj);
 
 } // fillEB()

@@ -238,7 +238,7 @@ void fillTracksAtECAL_with_EEproj ( int side, int ieta_global_offset, int ieta_s
       iphi_ = iphi_ - 1;
       idx_  = ieta_global_*EB_IPHI_MAX + iphi_;
       
-      if(trackDzSig_!=0)std::cout << "side:" << side << " ieta: " << ieta_signed_ << " iphi: " << iphi_ << " dzSig: " << trackDzSig_ << " original ieta:" << ieta << " iphi:" << iphi <<  std::endl;
+      //if(trackDzSig_!=0)std::cout << "side:" << side << " ieta: " << ieta_signed_ << " iphi: " << iphi_ << " dzSig: " << trackDzSig_ << " original ieta:" << ieta << " iphi:" << iphi <<  std::endl;
       // Fill vector for image
       vECAL_tracks_[proj][idx_] = track_;
       vECAL_tracksPt_[proj][idx_] = trackPt_;
@@ -422,6 +422,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           trackD0Error_ = iTk->d0Error();
           trackDz_ = iTk->dz();
           trackDzError_ = iTk->dzError();
+	  std::cout << "Case 1, 2, 3 " << std::endl;
           break;
         } //case 1, 2, 3
         case 5:
@@ -433,6 +434,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           trackD0Error_ = TMath::Sqrt(TMath::Power(traj.perigeeError().transverseImpactParameterError(),2) + TMath::Power(the_PV.xError(),2) + TMath::Power(the_PV.yError(),2));
           trackDz_ = traj.perigeeParameters().longitudinalImpactParameter();
           trackDzError_ = TMath::Sqrt(TMath::Power(traj.perigeeError().longitudinalImpactParameterError(),2) + TMath::Power(the_PV.zError(),2));
+	  std::cout << "Case 5 " << std::endl;
           break;
         } //case 5
         case 0: case 4: default:
@@ -443,6 +445,7 @@ void RecHitAnalyzer::fillTracksAtECALstitched ( const edm::Event& iEvent, const 
           trackDz_ = iTk->dz(the_PV.position());
           //trackDzError_ = iTk->dzError(the_PV.position());
           trackDzError_ = TMath::Sqrt(TMath::Power(iTk->dzError(),2) + TMath::Power(the_PV.zError(),2));
+	  //std::cout<<"Track d0:" << trackD0_ << " d0 error:" << trackD0Error_ << " dz:" << trackDz_ << " dz error:" << trackDzError_ << std::endl;
           break;
         } // case 0, 4, default
       } // switch
