@@ -4,14 +4,17 @@ using std::vector;
 const unsigned nJets = 50; //TODO: use cfg level nJets_
 
 //gen quatities
+int v_mr_NGen_a_; //number of Gen pseudoscalars
 vector<float> v_mr_Gen_mass_a_;
 vector<float> v_mr_Gen_pt_a_;
+int v_mr_NGenTaus_; //number of Gen taus
 vector<float> v_mr_Gen_tau_pt_;
 vector<float> v_mr_Gen_tau_eta_;
 vector<float> v_mr_Gen_tau_phi_;
 vector<float> v_mr_Gen_tau1_tau2_dR_;
 
 //jet quantities
+int v_mr_NJets_; //number of reco'ed jets
 vector<float> v_mr_jet_mass_;
 vector<float> v_mr_jet_pt_;
 vector<float> v_mr_jet_eta_;
@@ -19,14 +22,17 @@ vector<float> v_mr_jet_phi_;
 vector<float> v_mr_jet_genTau_dR_;
 vector<float> v_mr_jet_tau_dR_;
 vector<float> v_mr_jet1_jet2_dR_;
+int v_mr_NGenTau_JetMatched_; //number of gen taus matched to one jet
 
 //tau quantities
+int v_mr_NTaus_;
 vector<float> v_mr_tau_mass_;
 vector<float> v_mr_tau_pt_;
 vector<float> v_mr_tau_eta_;
 vector<float> v_mr_tau_phi_;
 vector<float> v_mr_tau_genTau_dR_;
 vector<float> v_mr_tau1_tau2_dR_;
+int v_mr_NTau_JetMatched_; //number of taus matched to one jet
 
 std::map<int, std::vector<int>> v_mr_jetToGenMap_;  // jet index -> matched gen particle indices
 std::vector<int> v_mr_jetIDs_;                          // jet index or unique ID
@@ -38,13 +44,16 @@ std::map<int, std::vector<int>> v_mr_jetToTauMap_;
 // Initialize branches _____________________________________________________//
 /////////////////////////////////////////////////////////////////////////////
 void RecHitAnalyzer::branchesEvtSel_jet_dijet_tau_massregression ( TTree* tree, edm::Service<TFileService> &fs ) {
+  tree->Branch("a_NumGen",          &v_mr_NGen_a_);
   tree->Branch("a_mass",            &v_mr_Gen_mass_a_);
   tree->Branch("a_pt",              &v_mr_Gen_pt_a_);
+  tree->Branch("NgenTaus",          &v_mr_NGenTaus_);
   tree->Branch("genTau_pt",         &v_mr_Gen_tau_pt_);
   tree->Branch("genTau_eta",        &v_mr_Gen_tau_eta_);
   tree->Branch("genTau_phi",        &v_mr_Gen_tau_phi_);
   tree->Branch("genTau1_Tau2_dr",   &v_mr_Gen_tau1_tau2_dR_);
 
+  tree->Branch("Njets",             &v_mr_NJets_);
   tree->Branch("jet_mass",          &v_mr_jet_mass_);
   tree->Branch("jet_pt",            &v_mr_jet_pt_);
   tree->Branch("jet_eta",           &v_mr_jet_eta_);
@@ -52,13 +61,16 @@ void RecHitAnalyzer::branchesEvtSel_jet_dijet_tau_massregression ( TTree* tree, 
   tree->Branch("jet_gen_dR",        &v_mr_jet_genTau_dR_);
   tree->Branch("jet_tau_dR",        &v_mr_jet_tau_dR_);
   tree->Branch("jet1_jet2_dR",      &v_mr_jet1_jet2_dR_);
+  tree->Branch("NGenTau_JetMatched",&v_mr_NGenTau_JetMatched_);
 
+  tree->Branch("NTaus",             &v_mr_NTaus_);
   tree->Branch("tau_mass",          &v_mr_tau_mass_);
   tree->Branch("tau_pt",            &v_mr_tau_pt_);
   tree->Branch("tau_eta",           &v_mr_tau_eta_);
   tree->Branch("tau_phi",           &v_mr_tau_phi_);
   tree->Branch("tau_gen_dR",        &v_mr_tau_genTau_dR_);
   tree->Branch("tau1_tau2_dR",      &v_mr_tau1_tau2_dR_);
+  tree->Branch("NTau_JetMatched",   &v_mr_NTau_JetMatched_);
 } // branchesEvtSel_jet_dijet_tau_massregression()
 
 ////////////////////////////////////////////////////////////////////////////
