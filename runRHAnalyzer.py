@@ -21,7 +21,7 @@ skipEvents_=0#
 #outputFile_='Ato2Tau_massreg_sample.root'
 #outputFile_='data_Tautrigger.root'
 #outputFile_='qcd_miniAOD_EBRHOnly.root'
-outputFile_='aTauTau_Genchecks.root'
+outputFile_='aTauTau_Genchecks_final.root'
 #outputFile_='ttbar_Tautrigger.root'
 
 # cmd="cmsTraceExceptions cmsRun %s inputFiles=%s maxEvents=%d skipEvents=%d outputFile=%s"%(cfg,inputFiles_,maxEvents_,skipEvents_,outputFile_)
