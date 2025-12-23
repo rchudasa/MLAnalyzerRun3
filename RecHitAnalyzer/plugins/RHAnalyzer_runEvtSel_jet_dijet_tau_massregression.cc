@@ -195,14 +195,15 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
  
   edm::Handle<pat::TauCollection> taus;
   iEvent.getByToken(tauCollectionT_, taus);
-  
+  v_mr_NGen_a_ = 0;v_mr_NGenTaus_ = 0; 
   v_mr_Gen_mass_a_.clear();
   v_mr_Gen_pt_a_.clear();
   v_mr_Gen_tau_pt_.clear();
   v_mr_Gen_tau_eta_.clear();
   v_mr_Gen_tau_phi_.clear();
   v_mr_Gen_tau1_tau2_dR_.clear();
- 
+
+  v_mr_NJets_ = 0; 
   v_mr_jet_mass_.clear();
   v_mr_jet_pt_.clear();
   v_mr_jet_eta_.clear();
@@ -210,7 +211,9 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
   v_mr_jet_genTau_dR_.clear();
   v_mr_jet_tau_dR_.clear();
   v_mr_jet1_jet2_dR_.clear();
- 
+  v_mr_NGenTau_JetMatched_=0;
+
+  v_mr_NTaus_=0; v_mr_NTau_JetMatched_ = 0;
   v_mr_tau_mass_.clear();
   v_mr_tau_pt_.clear();
   v_mr_tau_eta_.clear();
@@ -221,10 +224,11 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
   // Track unique mothers (a and a-bar) by pointer
   std::set<const reco::Candidate*> uniqueMothers;
   
+  v_mr_NJets_=vJetIdxs.size();
   // Loop over selected jets (in original order from vJetIdxs)
   for (int jetIdx : vJetIdxs) {
     const pat::Jet& jet = (*jets)[jetIdx];
-    
+    //v_mr_NJets_++;
     v_mr_jet_mass_.push_back(jet.mass());
     v_mr_jet_pt_.push_back(jet.pt());
     v_mr_jet_eta_.push_back(jet.eta());
@@ -232,6 +236,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
     
     if(debug)std::cout<< "--------------------------------------------------------------" << std::endl;
     if(debug)std::cout<< "FIlling out jet info pt and eta:" << jet.pt() << "  eta:" << jet.eta() << std::endl;
+   
     float minGenDR = 999.0f;
     const reco::GenParticle* bestGenTau = nullptr;
     std::vector<const reco::GenParticle*> genTausThisJet;
@@ -241,10 +246,11 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
     // =============================================
     auto genIt = v_mr_jetToGenMap_.find(jetIdx);
     if (genIt != v_mr_jetToGenMap_.end()) {
+      v_mr_NGenTau_JetMatched_= genIt->second.size();
       for (int gIdx : genIt->second) {
         const reco::GenParticle& genTau = (*genParticles)[gIdx];
         genTausThisJet.push_back(&genTau);
-	
+        v_mr_NGenTaus_++;
         // Store gen tau kinematics
         v_mr_Gen_tau_pt_.push_back(genTau.pt());
         v_mr_Gen_tau_eta_.push_back(genTau.eta());
@@ -254,7 +260,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	
 	// === DEDUPLICATED MOTHER INFO ===
 	
-	// ============ FIND ULTIMATE MOTHER (non-τ) ============
+	// ============ FIND ULTIMATE MOTHER ============
 	const reco::Candidate* current = &genTau;
 	const reco::Candidate* ultimateMother = nullptr;
 	
@@ -287,6 +293,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	if (uniqueMothers.insert(ultimateMother).second) {  // true only the first time
 	  
 	  //if(std::abs(mother->pdgId())!=25) continue;
+	  v_mr_NGen_a_++;
 	  v_mr_Gen_mass_a_.push_back(ultimateMother->mass());
 	  v_mr_Gen_pt_a_.push_back(ultimateMother->pt());
 	  if(debug)std::cout << "Pseudoscalar mother pdgId:" << ultimateMother->pdgId() << " mass :" << ultimateMother->mass() << " pt:" << ultimateMother->pt() << std::endl;
@@ -381,6 +388,9 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 
     auto tauIt = v_mr_jetToTauMap_.find(jetIdx);
     if (tauIt != v_mr_jetToTauMap_.end()) {
+      //v_mr_NTaus_ = recoTausThisJet.size();
+      v_mr_NTau_JetMatched_ = tauIt->second.size();
+
       for (int tIdx : tauIt->second) {
         const pat::Tau& tau = (*taus)[tIdx];
         recoTausThisJet.push_back(&tau);
