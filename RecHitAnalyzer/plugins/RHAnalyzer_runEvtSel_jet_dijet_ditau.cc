@@ -150,11 +150,14 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
         bool isHadronic = true;
         if ( std::abs(iGen->pdgId()) == 15 ) {
           for (unsigned int iDaughter = 0; iDaughter != iGen->numberOfDaughters(); ++iDaughter ){
-	    if ( abs(iGen->daughter(iDaughter)->pdgId()) == 11 || abs(iGen->daughter(iDaughter)->pdgId()) == 13 ) isHadronic = false;
+	    if ( abs(iGen->daughter(iDaughter)->pdgId()) == 11 || abs(iGen->daughter(iDaughter)->pdgId()) == 13 ){ 
+		    std::cout<<"------------Leptonic daughter"<< std::endl;
+		    isHadronic = false;
+	    }
           }
           if (isSignal_ && !isHadronic) continue;
           //JetIsTau = true;
-	  
+	   
 	  matchedGenIDs.push_back(iG);
           tauDaughters = 0;
           taupi0 = 0;
@@ -164,7 +167,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
             if ( iGen->daughter(iDaughter)->charge() == 0 ) continue;
             tauDaughters++;
           }
-          if ( debug ) std::cout << "    Tau prongs = " << tauDaughters << " + Tau pi0 = " << taupi0 << std::endl;
+          std::cout << "    Tau prongs = " << tauDaughters << " + Tau pi0 = " << taupi0 << std::endl;
 	  
         }
 	if(iGen->status()==23 || (isW_ && iGen->status()==71)){
@@ -195,7 +198,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
  
   jetMatchedEle = 0; 
   //apply lepton veto on jets here
-  for (size_t i = 0; i < jetIDs_.size(); ++i) {
+  /*for (size_t i = 0; i < jetIDs_.size(); ++i) {
     int jetIdx_i = jetIDs_[i];
     pat::Jet iJet = (*jets)[jetIdx_i];
 
@@ -257,7 +260,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_ditau( const edm::Event& iEvent, const 
     return false;
   }
   hNpassed_muVeto->Fill(1);
-
+*/
 
   for (size_t i = 0; i < jetIDs_.size(); ++i) {
     if( debug ) std::cout << "********************Jet ID: " << jetIDs_[i] << " matched to GenParticles IDs: ";
@@ -317,7 +320,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
   hNpassed_minTwoJets->Fill(1);
 
 
-  std::vector<std::vector<const reco::GenParticle*>> allTauDaughters;
+/*  std::vector<std::vector<const reco::GenParticle*>> allTauDaughters;
   
   for (size_t i = 0; i < genParticles->size(); ++i) {
     const reco::GenParticle& gen = genParticles->at(i);
@@ -393,7 +396,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_ditau ( const edm::Event& iEvent, cons
     else {std::cout << "none of the gen tau matched to gen-jet value map gen particle" << std::endl;}
     
   } //2 PS loop
-
+*/
   // jet loop ///////
   ///////////////////
   for ( size_t i=0; i < vJetIdxs.size(); ++i ) {

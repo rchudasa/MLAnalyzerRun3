@@ -1,7 +1,7 @@
 from CRABClient.UserUtilities import config
 config = config()
 
-Process = '3p7'
+Process = 'ATauTau'
 #Process = '10'
 
 inputDataset_ ={
@@ -15,7 +15,8 @@ inputDataset_ ={
         'WJets': "/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/lpcml-WJets_AODSIM_multiThreads-953b1873547799e513f8a43f2c57e3b2/USER",
         'DYTo2L':'/DYto2L_M-50_TuneCP5_13p6TeV_pythia8/lpcml-DYto2L_AODSIM_check-953b1873547799e513f8a43f2c57e3b2/USER',
         'TTbar': "/TT_TuneCP5_13p6TeV_powheg-pythia8/lpcml-TTbar_AODSIM_oneBlock-953b1873547799e513f8a43f2c57e3b2/USER",
-        'HTauTau':'/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/lpcml-HTauTau_AODSIM_oneBlock-953b1873547799e513f8a43f2c57e3b2/USER'
+        'HTauTau':'/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/lpcml-HTauTau_AODSIM_oneBlock-953b1873547799e513f8a43f2c57e3b2/USER',
+        'ATauTau':'/GEN_SIM_ATo2Tau_m3p6To18_pt30To300_v2/lpcml-ATauTau_miniAODSIM_RAWAOD-RecHits-7Jan2026-f2508c1b00fdd2cc2fdf87ba946bfa33/USER'
         }.get(Process, None)
 
 outputDataset_ = {
@@ -27,7 +28,7 @@ outputDataset_ = {
         }.get(Process, None)
 
 #config.section_('General')
-config.General.requestName = '%s_MLAnalyzer_miniAOD_bigProductionRe'%Process
+config.General.requestName = '%s_MLAnalyzer_TauMassReg_FNALOnly'%Process
 config.General.workArea = 'crab_bigProduction'
 config.General.transferOutputs = True
 config.General.transferLogs = True
@@ -36,30 +37,21 @@ config.General.transferLogs = True
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'RecHitAnalyzer/python/ConfFile_cfg.py'
 config.JobType.maxMemoryMB = 4000
-config.JobType.numCores = 4 
+config.JobType.numCores = 8 
 
 config.Data.inputDBS = 'phys03'
 config.JobType.allowUndistributedCMSSW = True
 config.Data.inputDataset =inputDataset_
 #config.Data.userInputFiles = open('%s'%inputProcess_).readlines()
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 1 
+config.Data.unitsPerJob = 5 
 #config.Data.outputPrimaryDataset = outputDataset_ 
 
 config.Data.ignoreLocality = True
 config.Site.whitelist = [
-    'T2_AT_Vienna', 'T2_BE_IIHE', 'T2_BE_UCL', 'T2_BR_SPRACE', 'T2_BR_UERJ',
-    'T2_CH_CERN', 'T2_CN_Beijing', 'T2_DE_DESY', 'T2_DE_RWTH',
-    'T2_EE_Estonia', 'T2_ES_CIEMAT', 'T2_ES_IFCA', 'T2_FI_HIP', 
-    'T2_FR_IPHC', 'T2_GR_Ioannina', 'T2_HU_Budapest', 'T2_IN_TIFR',
-    'T2_IT_Bari', 'T2_IT_Legnaro', 'T2_IT_Pisa', 'T2_IT_Rome',
-    'T2_KR_KISTI', 'T2_PK_NCP', 'T2_PL_Cyfronet', 
-    'T2_PT_NCG_Lisbon', 'T2_RU_IHEP', 
-    'T2_TR_METU', 'T2_TW_NCHC', 'T2_UA_KIPT',
-    'T2_UK_London_Brunel', 'T2_UK_London_IC', 'T2_UK_SGrid_Bristol',
-    'T2_UK_SGrid_RALPP', 'T2_US_Caltech', 'T2_US_Florida',
-    'T2_US_MIT', 'T2_US_Nebraska', 'T2_US_Purdue', 'T2_US_UCSD',
-    'T2_US_Vanderbilt', 'T2_US_Wisconsin'
+    'T3_US_FNALLPC'#,
+    #'T2_US_MIT', 'T2_US_Nebraska', 'T2_US_Purdue', 'T2_US_UCSD',
+    #'T2_US_Vanderbilt', 'T2_US_Wisconsin'
 ]
 
 config.Data.outLFNDirBase = '/store/group/lpcml/rchudasa/MCGenerationRun3'

@@ -95,15 +95,15 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_tau_massregression( const edm::Event& i
   v_mr_jetToTauMap_.clear();
 
   unsigned int nMatchedJets = 0;
-  std::cout<< std::endl;
-  if ( debug ) std::cout << " JETS IN THE EVENT = " << jets->size() << " | Selection requires minpT = " << minJetPt_ << " and maxEta = "<< maxJetEta_ << std::endl;
+  //std::cout<< std::endl;
+  //if ( debug ) std::cout << " JETS IN THE EVENT = " << jets->size() << " | Selection requires minpT = " << minJetPt_ << " and maxEta = "<< maxJetEta_ << std::endl;
   
   // Loop over jets
   for ( unsigned iJ(0); iJ != jets->size(); ++iJ ) {
     pat::Jet iJet = (*jets)[iJ];
     if (iJet.pt() < minJetPt_ ) continue;
     if (std::abs(iJet.eta()) > maxJetEta_ ) continue;
-    if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << " ,mass: "<< iJet.mass()<<  std::endl;
+    //if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << " ,mass: "<< iJet.mass()<<  std::endl;
     
     unsigned int iGenParticle = 0;
     std::vector<int> matchedGenIDs;
@@ -115,8 +115,8 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_tau_massregression( const edm::Event& i
       if ( !( std::abs(iGen->pdgId()) == 15 && iGen->status() == 2 ) ) continue;  //only for tau signal
       if(iGen->numberOfMothers() != 1) continue;
       
-      if(debug)std::cout << "   GEN particle " << iGenParticle << " index [" << iG << "] -> status: " << iGen->status() << ", id: " << iGen->pdgId() << ", nDaught: " << iGen->numberOfDaughters() << " nMoms: " <<iGen->numberOfMothers() << " | pt: "<< iGen->pt() << " eta: " <<iGen->eta() << " phi: " <<iGen->phi() << " | dR: " << dR << std::endl;
-      if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << std::endl;
+      //if(debug)std::cout << "   GEN particle " << iGenParticle << " index [" << iG << "] -> status: " << iGen->status() << ", id: " << iGen->pdgId() << ", nDaught: " << iGen->numberOfDaughters() << " nMoms: " <<iGen->numberOfMothers() << " | pt: "<< iGen->pt() << " eta: " <<iGen->eta() << " phi: " <<iGen->phi() << " | dR: " << dR << std::endl;
+      //if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << std::endl;
       
       bool isHadronic = true;
       if ( std::abs(iGen->pdgId()) == 15 ) {
@@ -132,13 +132,12 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_tau_massregression( const edm::Event& i
     
     
     if (!matchedGenIDs.empty()) {
-      if(debug)std::cout << " Matched gen ID not empty" << std::endl;
+      //if(debug)std::cout << " Matched gen ID not empty" << std::endl;
       v_mr_jetIDs_.push_back(iJ);  // Index of the jet in the collection
       v_mr_matchedGenIDs_.push_back(matchedGenIDs);  // All matched gen IDs for this jet
       v_mr_jetToGenMap_[iJ] = matchedGenIDs;
     }
   } // reco jets
-  
   
   // After you've filled jetIDs_ and matchedGenIDs_ for the current event
   for (int jetIdx : v_mr_jetIDs_) {
@@ -155,14 +154,15 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_tau_massregression( const edm::Event& i
       v_mr_matchedTauIDs_.push_back(matchedTauIDs); 
       v_mr_jetToTauMap_[jetIdx] = matchedTauIDs;
     }
+    if(debug)std::cout << "Taus matched to one jet:" << v_mr_matchedTauIDs_.size() << std::endl;
   }
   
   
   for (size_t i = 0; i < v_mr_jetIDs_.size(); ++i) {
-    if( debug ) std::cout << "********************Jet ID: " << v_mr_jetIDs_[i] << " matched to GenParticles IDs: ";
+    if(debug)std::cout << "********************Jet ID: " << v_mr_jetIDs_[i] << " matched to GenParticles IDs: ";
     vJetIdxs.push_back(v_mr_jetIDs_[i]);
     for (size_t j = 0; j < v_mr_matchedGenIDs_[i].size(); ++j) {
-      if( debug ) std::cout << v_mr_matchedGenIDs_[i][j];
+      if(debug)std::cout << v_mr_matchedGenIDs_[i][j];
       if (j != v_mr_matchedGenIDs_[i].size() - 1) { if( debug ) std::cout << ", ";}
     }
     if(debug)std::cout << std::endl;
@@ -256,7 +256,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
         v_mr_Gen_tau_eta_.push_back(genTau.eta());
         v_mr_Gen_tau_phi_.push_back(genTau.phi());
 	
-	std::cout <<" Gen tau pt:" << genTau.pt() << " eta:" << genTau.eta() << std::endl; 
+	if(debug)std::cout <<" Gen tau pt:" << genTau.pt() << " eta:" << genTau.eta() << std::endl; 
 	
 	// === DEDUPLICATED MOTHER INFO ===
 	
@@ -268,8 +268,8 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	  const reco::Candidate* mom = current->mother(0);
 	  if (std::abs(mom->pdgId()) == 25) {  // not a tau this is the real mother (Higgs/a)
 	    ultimateMother = mom;
-            std::cout << "Nemo found his mother pdgId:" << mom->pdgId() << " pt" << mom->pt() << " mass:" << mom->mass() << " eta:" << mom->eta();
-            std::cout << " phi:" << mom->phi()  << std::endl;
+            if(debug)std::cout << "Nemo found his mother pdgId:" << mom->pdgId() << " pt" << mom->pt() << " mass:" << mom->mass() << " eta:" << mom->eta();
+            if(debug)std::cout << " phi:" << mom->phi()  << std::endl;
 	    
 	    break;
 	  }
@@ -310,10 +310,10 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	    const reco::Candidate* current = toExplore.front();
 	    toExplore.pop();
 	    
-	    // If this is a status=2 τ → it's one of the ultimate daughters we want
+	    // If this is a status=2 it's one of the ultimate daughters we want
 	    if (std::abs(current->pdgId()) == 15 && current->status() == 2) {
 	      ultimateStatus2Taus.push_back(current);
-	      if (debug) std::cout << "   → Found ultimate status=2 τ: pt=" << current->pt()
+	      if (debug) std::cout << "   Found ultimate status=2  pt=" << current->pt()
 				   << " eta=" << current->eta() << " phi=" << current->phi() << std::endl;
 	      continue;  // no need to explore further down this branch
 	    }
@@ -324,51 +324,19 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	    }
 	  }
 	  
-	  // Now use the collected ultimate status=2 τ's
-	  if (debug) std::cout << "   → Total ultimate status=2 τ daughters found: "
+	  // Now use the collected ultimate status=2 
+	  if (debug) std::cout << "   Total ultimate status=2 daughters found: "
 			       << ultimateStatus2Taus.size() << std::endl;
 	  
-	  // Store pairwise ΔR (assuming exactly 2 in signal: τ⁺ and τ⁻ from the same mother)
+	  // Store dR from the same mother)
 	  if (ultimateStatus2Taus.size() >= 2) {
 	    // You can store just the first pair, or all pairs if >2 (rare)
 	    float tauPairDR = reco::deltaR(*ultimateStatus2Taus[0], *ultimateStatus2Taus[1]);
 	    v_mr_Gen_tau1_tau2_dR_.push_back(tauPairDR);
 	    
-	    if (debug) std::cout << " >>> Storing gen τ₁–τ₂ ΔR = " << tauPairDR << std::endl;
+	    if (debug) std::cout << " >>> Storing gen tau1-tau2 dR " << tauPairDR << std::endl;
 	  }
-	  
-	  // Collect all status=2 tau daughters
-	  /*  std::vector<const reco::Candidate*> status2Taus;
-	      unsigned int nDaughters = ultimateMother->numberOfDaughters();
-	      if(debug)std::cout << "Mother has " << nDaughters << " daughters:" << std::endl;
-	      
-	      for (unsigned int d = 0; d < nDaughters; ++d) {
-	      const reco::Candidate* dau = ultimateMother->daughter(d);
-	      int pdgId = dau->pdgId();
-	      
-	      if (std::abs(pdgId) == 15 && dau->status() == 2) {
-	      status2Taus.push_back(dau);
-	      if(debug)std::cout << "  Daughter " << d << ": tau (pdgId=" << pdgId
-	      << "), status=" << dau->status()
-	      << ", pt=" << dau->pt()
-				 << ", eta=" << dau->eta()
-				 << ", phi=" << dau->phi() << std::endl;
-				 } //status and pdgId
-				 }//ndaughters
-				 
-				 if(debug)std::cout << "Found " << status2Taus.size() << " status=2 taus among daughters." << std::endl;
-				 
-				 // Compute and store pairwise dR between status=2 taus (you expect exactly 2)
-				 if (status2Taus.size() >= 2) {
-				 // Assuming exactly 2 (as you said there will definitely be 2)
-				 float tauPairDR = reco::deltaR(*status2Taus[0], *status2Taus[1]);
-				 v_mr_Gen_tau1_tau2_dR_.push_back(tauPairDR);
-	    
-				 if(debug)std::cout << "dR between the two status=2 taus: " << tauPairDR << std::endl; 
-				 }*/
-	  
 	}
-	//}
 	
         // Update closest gen tau for this jet
         float dR = reco::deltaR(jet, genTau);
@@ -385,16 +353,15 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
     // =============================================
     float minRecoDR = 999.0f;
     std::vector<const pat::Tau*> recoTausThisJet;
-
+    
     auto tauIt = v_mr_jetToTauMap_.find(jetIdx);
     if (tauIt != v_mr_jetToTauMap_.end()) {
-      //v_mr_NTaus_ = recoTausThisJet.size();
       v_mr_NTau_JetMatched_ = tauIt->second.size();
 
       for (int tIdx : tauIt->second) {
         const pat::Tau& tau = (*taus)[tIdx];
         recoTausThisJet.push_back(&tau);
-
+        v_mr_NTaus_++;
         v_mr_tau_mass_.push_back(tau.mass());
         v_mr_tau_pt_.push_back(tau.pt());
         v_mr_tau_eta_.push_back(tau.eta());
