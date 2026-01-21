@@ -28,7 +28,7 @@ outputDataset_ = {
         }.get(Process, None)
 
 #config.section_('General')
-config.General.requestName = '%s_MLAnalyzer_TauMassReg_FNALOnly'%Process
+config.General.requestName = '%s_MLAnalyzer_TauMassReg_21Jan'%Process
 config.General.workArea = 'crab_bigProduction'
 config.General.transferOutputs = True
 config.General.transferLogs = True
@@ -36,22 +36,22 @@ config.General.transferLogs = True
 #config.section_('JobType')
 config.JobType.pluginName = 'Analysis'
 config.JobType.psetName = 'RecHitAnalyzer/python/ConfFile_cfg.py'
-config.JobType.maxMemoryMB = 4000
-config.JobType.numCores = 8 
+config.JobType.maxMemoryMB = 3000
+config.JobType.numCores = 1 
 
 config.Data.inputDBS = 'phys03'
 config.JobType.allowUndistributedCMSSW = True
 config.Data.inputDataset =inputDataset_
 #config.Data.userInputFiles = open('%s'%inputProcess_).readlines()
 config.Data.splitting = 'FileBased'
-config.Data.unitsPerJob = 5 
+config.Data.unitsPerJob = 1 
 #config.Data.outputPrimaryDataset = outputDataset_ 
 
 config.Data.ignoreLocality = True
 config.Site.whitelist = [
-    'T3_US_FNALLPC'#,
-    #'T2_US_MIT', 'T2_US_Nebraska', 'T2_US_Purdue', 'T2_US_UCSD',
-    #'T2_US_Vanderbilt', 'T2_US_Wisconsin'
+    'T3_US_FNALLPC',
+    'T2_US_MIT', 'T2_US_Nebraska', 'T2_US_Purdue', 'T2_US_UCSD',
+    'T2_US_Vanderbilt', 'T2_US_Wisconsin'
 ]
 
 config.Data.outLFNDirBase = '/store/group/lpcml/rchudasa/MCGenerationRun3'

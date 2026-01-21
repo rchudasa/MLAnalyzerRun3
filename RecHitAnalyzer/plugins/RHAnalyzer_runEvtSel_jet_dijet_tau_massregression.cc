@@ -275,7 +275,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	     // Collect all status=2 tau daughters
 	    std::vector<const reco::Candidate*> status2Taus;
 	    unsigned int nDaughters = mother->numberOfDaughters();
-	    std::cout << "Mother has " << nDaughters << " daughters:" << std::endl;
+	    if(debug)std::cout << "Mother has " << nDaughters << " daughters:" << std::endl;
 	    
 	    for (unsigned int d = 0; d < nDaughters; ++d) {
 	      const reco::Candidate* dau = mother->daughter(d);
@@ -283,7 +283,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	      
 	      if (std::abs(pdgId) == 15 && dau->status() == 2) {
 		status2Taus.push_back(dau);
-		std::cout << "  Daughter " << d << ": tau (pdgId=" << pdgId
+		if(debug)std::cout << "  Daughter " << d << ": tau (pdgId=" << pdgId
 			  << "), status=" << dau->status()
 			  << ", pt=" << dau->pt()
 			  << ", eta=" << dau->eta()
@@ -291,7 +291,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	      } //status and pdgId
 	    }//ndaughters
 	    
-	    std::cout << "Found " << status2Taus.size() << " status=2 taus among daughters." << std::endl;
+	    if(debug)std::cout << "Found " << status2Taus.size() << " status=2 taus among daughters." << std::endl;
 
 	    // Compute and store pairwise dR between status=2 taus (you expect exactly 2)
 	    if (status2Taus.size() >= 2) {
@@ -299,7 +299,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	      float tauPairDR = reco::deltaR(*status2Taus[0], *status2Taus[1]);
 	      v_mr_Gen_tau1_tau2_dR_.push_back(tauPairDR);
 	      
-	      std::cout << "dR between the two status=2 taus: " << tauPairDR << std::endl; 
+	      if(debug)std::cout << "dR between the two status=2 taus: " << tauPairDR << std::endl; 
 	    }
 	    
 	  }
