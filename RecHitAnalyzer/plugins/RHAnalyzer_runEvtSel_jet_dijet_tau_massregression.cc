@@ -114,7 +114,7 @@ bool RecHitAnalyzer::runEvtSel_jet_dijet_tau_massregression( const edm::Event& i
       if ( dR > 0.4 ) continue;
       if ( !( std::abs(iGen->pdgId()) == 15 && iGen->status() == 2 ) ) continue;  //only for tau signal
       if(iGen->numberOfMothers() != 1) continue;
-      
+      if(iGen->mother()->pdgId() !=25) continue;
       //if(debug)std::cout << "   GEN particle " << iGenParticle << " index [" << iG << "] -> status: " << iGen->status() << ", id: " << iGen->pdgId() << ", nDaught: " << iGen->numberOfDaughters() << " nMoms: " <<iGen->numberOfMothers() << " | pt: "<< iGen->pt() << " eta: " <<iGen->eta() << " phi: " <<iGen->phi() << " | dR: " << dR << std::endl;
       //if (debug ) std::cout << "  >>>>>> Jet [" << iJ << "] ->  Pt: " << iJet.pt() << ", Eta: " << iJet.eta() << ", Phi: " << iJet.phi() << std::endl;
       
@@ -225,6 +225,7 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
   std::set<const reco::Candidate*> uniqueMothers;
   
   v_mr_NJets_=vJetIdxs.size();
+
   // Loop over selected jets (in original order from vJetIdxs)
   for (int jetIdx : vJetIdxs) {
     const pat::Jet& jet = (*jets)[jetIdx];
@@ -247,11 +248,13 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
     auto genIt = v_mr_jetToGenMap_.find(jetIdx);
     if (genIt != v_mr_jetToGenMap_.end()) {
       v_mr_NGenTau_JetMatched_= genIt->second.size();
+
       for (int gIdx : genIt->second) {
         const reco::GenParticle& genTau = (*genParticles)[gIdx];
         genTausThisJet.push_back(&genTau);
         v_mr_NGenTaus_++;
-        // Store gen tau kinematics
+
+	// Store gen tau kinematics
         v_mr_Gen_tau_pt_.push_back(genTau.pt());
         v_mr_Gen_tau_eta_.push_back(genTau.eta());
         v_mr_Gen_tau_phi_.push_back(genTau.phi());
@@ -260,93 +263,50 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
 	
 	// === DEDUPLICATED MOTHER INFO ===
 	
-	// ============ FIND ULTIMATE MOTHER ============
-	const reco::Candidate* current = &genTau;
-	const reco::Candidate* ultimateMother = nullptr;
-	
-	while (current->numberOfMothers() > 0) {
-	  const reco::Candidate* mom = current->mother(0);
-	  if (std::abs(mom->pdgId()) == 25) {  // not a tau this is the real mother (Higgs/a)
-	    ultimateMother = mom;
-            if(debug)std::cout << "Nemo found his mother pdgId:" << mom->pdgId() << " pt" << mom->pt() << " mass:" << mom->mass() << " eta:" << mom->eta();
-            if(debug)std::cout << " phi:" << mom->phi()  << std::endl;
+	if (genTau.numberOfMothers() > 0) {
+	  const reco::Candidate* mother = genTau.mother(0);
+
+	  if (uniqueMothers.insert(mother).second) {  // true only the first time
+	  
+	    v_mr_NGen_a_++;
+	    v_mr_Gen_mass_a_.push_back(mother->mass());
+	    v_mr_Gen_pt_a_.push_back(mother->pt());
+	    if(debug)std::cout << "Pseudoscalar mother pdgId:" << mother->pdgId() << " mass :" << mother->mass() << " pt:" << mother->pt() << std::endl;
+	     // Collect all status=2 tau daughters
+	    std::vector<const reco::Candidate*> status2Taus;
+	    unsigned int nDaughters = mother->numberOfDaughters();
+	    std::cout << "Mother has " << nDaughters << " daughters:" << std::endl;
 	    
-	    break;
-	  }
-	  current = mom;  // continue climbing if mother is another tau copy
-	}
-	
-	// If no  mother found, skip (shouldn't happen in signal)
-	if (!ultimateMother) {
-	  if (debug) std::cout << "   No  mother found for this gen tau" << std::endl;
-	  continue;
-	}
-	
-	if (debug) {
-	  std::cout << " Ultimate mother pdgId: " << ultimateMother->pdgId()
-		    << " mass: " << ultimateMother->mass()
-		    << " pt: " << ultimateMother->pt() << std::endl;
-	}
-	
-	//if (genTau.numberOfMothers() > 0) {
-	//const reco::Candidate* mother = genTau.mother(0);
-	if (uniqueMothers.insert(ultimateMother).second) {  // true only the first time
-	  
-	  //if(std::abs(mother->pdgId())!=25) continue;
-	  v_mr_NGen_a_++;
-	  v_mr_Gen_mass_a_.push_back(ultimateMother->mass());
-	  v_mr_Gen_pt_a_.push_back(ultimateMother->pt());
-	  if(debug)std::cout << "Pseudoscalar mother pdgId:" << ultimateMother->pdgId() << " mass :" << ultimateMother->mass() << " pt:" << ultimateMother->pt() << std::endl;
-	  
-	  std::vector<const reco::Candidate*> ultimateStatus2Taus;
-	  
-	  // Start from direct daughters of the ultimateMother
-	  std::queue<const reco::Candidate*> toExplore;
-	  for (unsigned int i = 0; i < ultimateMother->numberOfDaughters(); ++i) {
-	    toExplore.push(ultimateMother->daughter(i));
-	  }
-	  
-	  while (!toExplore.empty()) {
-	    const reco::Candidate* current = toExplore.front();
-	    toExplore.pop();
+	    for (unsigned int d = 0; d < nDaughters; ++d) {
+	      const reco::Candidate* dau = mother->daughter(d);
+	      int pdgId = dau->pdgId();
+	      
+	      if (std::abs(pdgId) == 15 && dau->status() == 2) {
+		status2Taus.push_back(dau);
+		std::cout << "  Daughter " << d << ": tau (pdgId=" << pdgId
+			  << "), status=" << dau->status()
+			  << ", pt=" << dau->pt()
+			  << ", eta=" << dau->eta()
+			  << ", phi=" << dau->phi() << std::endl;
+	      } //status and pdgId
+	    }//ndaughters
 	    
-	    // If this is a status=2 it's one of the ultimate daughters we want
-	    if (std::abs(current->pdgId()) == 15 && current->status() == 2) {
-	      ultimateStatus2Taus.push_back(current);
-	      if (debug) std::cout << "   Found ultimate status=2  pt=" << current->pt()
-				   << " eta=" << current->eta() << " phi=" << current->phi() << std::endl;
-	      continue;  // no need to explore further down this branch
+	    std::cout << "Found " << status2Taus.size() << " status=2 taus among daughters." << std::endl;
+
+	    // Compute and store pairwise dR between status=2 taus (you expect exactly 2)
+	    if (status2Taus.size() >= 2) {
+	      // Assuming exactly 2 (as you said there will definitely be 2)
+	      float tauPairDR = reco::deltaR(*status2Taus[0], *status2Taus[1]);
+	      v_mr_Gen_tau1_tau2_dR_.push_back(tauPairDR);
+	      
+	      std::cout << "dR between the two status=2 taus: " << tauPairDR << std::endl; 
 	    }
 	    
-	    // Otherwise, explore its daughters (if any)
-	    for (unsigned int i = 0; i < current->numberOfDaughters(); ++i) {
-	      toExplore.push(current->daughter(i));
-	    }
 	  }
-	  
-	  // Now use the collected ultimate status=2 
-	  if (debug) std::cout << "   Total ultimate status=2 daughters found: "
-			       << ultimateStatus2Taus.size() << std::endl;
-	  
-	  // Store dR from the same mother)
-	  if (ultimateStatus2Taus.size() >= 2) {
-	    // You can store just the first pair, or all pairs if >2 (rare)
-	    float tauPairDR = reco::deltaR(*ultimateStatus2Taus[0], *ultimateStatus2Taus[1]);
-	    v_mr_Gen_tau1_tau2_dR_.push_back(tauPairDR);
-	    
-	    if (debug) std::cout << " >>> Storing gen tau1-tau2 dR " << tauPairDR << std::endl;
-	  }
-	}
-	
-        // Update closest gen tau for this jet
-        float dR = reco::deltaR(jet, genTau);
-        v_mr_jet_genTau_dR_.push_back(dR);
+	} //genTau mother >0
       } //gen loop
     }//jetGen map
     
-    //float tau1_tau2_dR = genTausThisJet.size() >= 2 ? reco::deltaR(*genTausThisJet[0], *genTausThisJet[1]) : -1.0f;
-    //v_mr_Gen_tau1_tau2_dR_.push_back(tau1_tau2_dR);
-    //std::cout <<"jet and gen dR:" << minGenDR << " tau1-tau2 dR gen level: " << tau1_tau2_dR << std::endl;
     
     // =============================================
     // Reco tau lop: store ALL matched reco taus
@@ -375,10 +335,6 @@ void RecHitAnalyzer::fillEvtSel_jet_dijet_tau_massregression ( const edm::Event&
     }//jetTauMap
   }  
 
-  // Safety: if no mother found (should never happen in signal), push dummies
-  //if (v_mr_Gen_mass_a_.empty()) {
-  //  v_mr_Gen_mass_a_.push_back(-1.0f);
-  //  v_mr_Gen_pt_a_.push_back(-1.0f);
- // }
+
 }//fill  
 
