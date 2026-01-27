@@ -1,0 +1,15 @@
+Universe              = vanilla
+Executable            = runRHAnalyzer_condor.sh
+Arguments             = $(Process)  
+GetEnv                = True
+transfer_input_files  = RecHitAnalyzer/python/ConfFile_cfg.py, CMSSW_13_0_14.tar.gz
+Should_transfer_files     = YES
+when_to_transfer_output   = ON_EXIT
+requirements 	          = OpSysAndVer == "RedHat8"
+Output                    = output/$(Cluster)_$(Process).stdout
+Error                     = error/$(Cluster)_$(Process).stderr
+Log                       = log/$(Cluster)_$(Process).log
+x509userproxy             = /uscms/home/rchudasa/x509up_u3702
+
++JobFlavour               = "workday"
+Queue 10 
