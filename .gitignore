@@ -13,6 +13,9 @@ plottingMacros/croppedJetIMG_*
 *.hdf5
 *.parquet*
 .*.*
+output/*
+error/*
+log/*
 __init__.py
 crab_MC
 crab_MC/*
