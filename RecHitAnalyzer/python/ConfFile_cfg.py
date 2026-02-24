@@ -47,14 +47,15 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
       options.inputFiles
       )
-    , skipEvents = cms.untracked.uint32(options.skipEvents)
+    , skipEvents = cms.untracked.uint32(1)
+    #, skipEvents = cms.untracked.uint32(options.skipEvents)
     )
 print (" >> Loaded",len(options.inputFiles),"input files from list.")
 
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
-    # ,SkipEvent = cms.untracked.vstring('ProductNotFound')
+    ,SkipEvent = cms.untracked.vstring('ProductNotFound')
     ,numberOfThreads = cms.untracked.uint32(1)
 )
 

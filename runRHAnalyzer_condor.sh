@@ -15,7 +15,7 @@ echo $CMSSW_BASE "is the CMSSW we have on the local worker node"
 export _CONDOR_SCRATCH_DIR=${PWD}
 cd ${_CONDOR_SCRATCH_DIR}
 
-inputFile=`sed "${1}q;d" /uscms/home/rchudasa/nobackup/run3Analysis/CMSSW_13_0_14/src/MLAnalyzerRun3/input_list.txt`
+inputFile=`sed "${1}q;d" /uscms/home/rchudasa/nobackup/run3Analysis/CMSSW_13_0_14/src/MLAnalyzerRun3/miniAOD_ATauTau.txt`
 outputFile="MLNtuples_ATauTau_${1}.root"
 
 if [ -s ${outputFile} ]
